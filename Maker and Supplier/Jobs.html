@@ -54,6 +54,8 @@ main .wrap { padding-block: 18px 60px; }
 .job { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; text-align: left; width: 100%;
   background: var(--surface); border: 0; border-radius: 16px; padding: 14px 18px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.04);
   transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.job.hit { box-shadow: 0 0 0 2px var(--primary), 0 10px 28px -12px color-mix(in srgb, var(--primary) 45%, transparent); }
+.job .tagno { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--primary); }
 .job:hover { transform: scale(1.006); box-shadow: 0 10px 28px -10px rgba(0,0,0,.18); }
 .job .no { font-weight: 700; font-size: 19px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
 .job .no small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: 0; }
@@ -158,7 +160,7 @@ dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); wi
     <div class="more" id="moreWrap" hidden><button class="btn" type="button" id="moreBtn">แสดงเพิ่ม</button></div>
   </div>
 </main>
-<footer class="wrap" style="padding-block:0 28px">NDT-B Service Portal V1.03 · Job Tracker</footer>
+<footer class="wrap" style="padding-block:0 28px">NDT-B Service Portal V1.04 · Job Tracker</footer>
 
 <dialog id="dlg" aria-labelledby="dTitle">
   <div class="dlg">
@@ -285,12 +287,19 @@ dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); wi
 
   function filtered(ignoreBucket) {
     const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-    return state.jobs.filter(j =>
+    const num = numQuery();
+    const list = state.jobs.filter(j =>
       (!state.year || j.tab === state.year) &&
       (!state.person || clean(j.engineer) === state.person || clean(j.sales) === state.person) &&
-      (ignoreBucket || state.bucket === 'all' || (state.bucket === 'open' ? isOpen(j) : j._b === state.bucket)) &&
-      words.every(w => j._search.includes(w) || j.jobNo === w.replace(/,/g, '')));
+      (ignoreBucket || num || state.bucket === 'all' || (state.bucket === 'open' ? isOpen(j) : j._b === state.bucket)) &&
+      (num ? (j.jobNo.includes(num) || j._search.includes(num)) : words.every(w => j._search.includes(w))));
+    if (!num) return list;
+    // พิมพ์ตัวเลข → ให้ Job No. มาก่อน: ตรงทั้งเลข → ขึ้นต้นด้วย → มีเลขนี้ใน Job No. → เจอในช่องอื่น (S/N, PO ฯลฯ)
+    const rank = j => j.jobNo === num ? 0 : j.jobNo.startsWith(num) ? 1 : j.jobNo.includes(num) ? 2 : 3;
+    return list.map((j, i) => [rank(j), i, j]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2]);
   }
+  // คืนตัวเลขที่พิมพ์ (ตัด , และช่องว่าง) ถ้าช่องค้นหาเป็นตัวเลขล้วน
+  function numQuery() { const s = state.q.replace(/[,\s]/g, ''); return /^\d{2,}$/.test(s) ? s : ''; }
 
   function renderChips() {
     const base = filtered(true);
@@ -305,7 +314,7 @@ dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); wi
     renderChips();
     const list = filtered();
     const shown = list.slice(0, state.shown);
-    const filters = [state.q && '“' + state.q + '”', state.year && 'ปี ' + state.year, state.person].filter(Boolean);
+    const filters = [state.q && (numQuery() ? 'Job No. / เลข “' + state.q + '” (ทุกสถานะ)' : '“' + state.q + '”'), state.year && 'ปี ' + state.year, state.person].filter(Boolean);
     $('#resultline').innerHTML = '<span>' + list.length + ' งาน' + (filters.length ? ' · ' + esc(filters.join(' · ')) : '') + '</span>' +
       (filters.length || state.bucket !== 'open' ? '<button type="button" id="clearBtn">ล้างตัวกรอง</button>' : '');
     $('#list').innerHTML = shown.length ? shown.map(row).join('') :
@@ -317,8 +326,9 @@ dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); wi
     const b = B(j._b);
     const age = j._age != null ? '<span class="age' + (j._age > 30 ? ' late' : '') + '">ค้าง ' + j._age + ' วัน</span>' : (j.returned ? '<span class="age">คืน ' + esc(fmtDate(j.returned)) + '</span>' : '');
     const who = [clean(j.engineer), clean(j.sales)].filter(Boolean).join(' · ');
-    return '<button class="job" type="button" data-job="' + esc(j.jobNo) + '" data-tab="' + esc(j.tab) + '">' +
-      '<div class="no">' + esc(fmtJob(j.jobNo)) + '<small>' + esc(fmtDate(j.received) || '–') + '</small></div>' +
+    const hit = numQuery() && j.jobNo === numQuery();
+    return '<button class="job' + (hit ? ' hit' : '') + '" type="button" data-job="' + esc(j.jobNo) + '" data-tab="' + esc(j.tab) + '">' +
+      '<div class="no">' + esc(fmtJob(j.jobNo)) + (hit ? '<span class="tagno">ตรง Job No.</span>' : '') + '<small>' + esc(fmtDate(j.received) || '–') + '</small></div>' +
       '<div class="main"><div class="cust">' + esc(clean(j.customer) || '—') + '</div><div class="desc">' + esc(clean(j.desc)) + '</div>' +
       '<div class="meta">' + (who ? '<span>' + esc(who) + '</span>' : '') + (j.price ? '<span>' + esc(j.price) + ' บาท</span>' : '') + (j.location ? '<span>อยู่ที่ ' + esc(j.location) + '</span>' : '') + '</div></div>' +
       '<div class="side"><span class="pill" style="--c:' + b.color + '">' + esc(statusText(j)) + '</span>' + age + '</div>' +
@@ -355,7 +365,8 @@ dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); wi
   }
 
   // ---------- events ----------
-  $('#q').addEventListener('input', e => { state.q = e.target.value.trim(); state.shown = PAGE; if (/^\d{4,}$/.test(state.q)) state.bucket = 'all'; render(); });
+  $('#q').addEventListener('input', e => { state.q = e.target.value.trim(); state.shown = PAGE; render(); });
+  $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const num = numQuery(); const j = num && state.jobs.find(x => x.jobNo === num); if (j) openJob(j.jobNo, j.tab); } });
   $('#chips').addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; state.bucket = b.dataset.b; state.shown = PAGE; render(); });
   $('#fPerson').addEventListener('change', e => { state.person = e.target.value; state.shown = PAGE; render(); });
   $('#fYear').addEventListener('change', e => {

@@ -1,5 +1,5 @@
 /**
- * NDT-B Service Portal  V1.03  (2 พ.ย. 2026) — เชื่อมชีตงาน + Job Tracker (JobBook.gs, Jobs.html)
+ * NDT-B Service Portal  V1.04  (2 พ.ย. 2026) — Job Tracker: ค้นหาด้วยตัวเลขให้ Job No. มาก่อน
  * หน้าหลัก → (1) Maker Directory  (2) Request Check Sheet (Receive / Return) พิมพ์เป็น PDF
  *
  * ผูกสคริปต์นี้กับสเปรดชีต "Contact Maker and Supplier" (Extensions → Apps Script)
@@ -9,7 +9,7 @@
  */
 
 // ======================= ค่าคงที่ =======================
-var APP_VERSION = 'V1.03';
+var APP_VERSION = 'V1.04';
 var MAKER_SHEET_NAME = 'ชีต1';           // ถ้าไม่เจอชื่อนี้ จะใช้แท็บแรกของไฟล์
 var REQ_SHEET_NAME = 'RequestCheckSheet';
 var STAFF_SHEET_NAME = 'Staff';
