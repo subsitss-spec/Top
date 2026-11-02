@@ -1,0 +1,385 @@
+<title>Job Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Roboto+Slab:wght@700&display=swap">
+<style>
+/* Layout: hero (title + live counts) → glass toolbar (search, status, year, engineer) → job list; a job opens a dialog with its timeline. Colors come from Theme.html */
+:root {
+  --bg: #f5f5f7; --surface: #ffffff; --surface-2: #f5f5f7; --fg: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7;
+  --primary: #0071e3; --primary-fg: #fff;
+  --st-recv: #8e44ad; --st-work: #0071e3; --st-wait: #c77700; --st-done: #248a3d; --st-cancel: #8e8e93; --st-late: #d70015;
+  --font-body: -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans Thai", "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-body); --font-mono: var(--font-body);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --st-recv: #bf5af2; --st-work: #2997ff; --st-wait: #ff9f0a; --st-done: #30d158; --st-cancel: #98989d; --st-late: #ff6961; }
+}
+:root[data-theme="dark"] { --st-recv: #bf5af2; --st-work: #2997ff; --st-wait: #ff9f0a; --st-done: #30d158; --st-cancel: #98989d; --st-late: #ff6961; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); }
+body { margin: 0; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.masthead .wrap { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.brand { display: grid; gap: 4px; min-width: 0; }
+.backlink { display: inline-flex; align-items: center; text-decoration: none; width: fit-content; }
+.backlink svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+.brand h1 { margin: 0; }
+.brand p { margin: 0; }
+.tag { display: flex; overflow: hidden; }
+.tag div { display: grid; line-height: 1.2; min-width: 84px; }
+.tag b { font-variant-numeric: tabular-nums; }
+.tag div.late b { color: var(--st-late); }
+
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+.toolbar .wrap { padding-block: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.search { flex: 1 1 280px; min-width: 0; position: relative; }
+.search input { width: 100%; padding: 0 14px 0 38px; }
+.search svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 17px; height: 17px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { padding: 0 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+.chip .n { font-size: 12px; opacity: .7; font-variant-numeric: tabular-nums; }
+.selects { display: flex; gap: 8px; flex-wrap: wrap; }
+.selects select { height: 36px; border-radius: 980px; border: 0; padding: 0 30px 0 14px; background: color-mix(in srgb, var(--fg) 7%, transparent); cursor: pointer; }
+
+main .wrap { padding-block: 18px 60px; }
+.resultline { color: var(--muted); font-size: 13px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.resultline button { border: 0; background: none; color: var(--primary); cursor: pointer; padding: 0; font-size: 13px; }
+
+.list { display: grid; gap: 10px; }
+.job { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; text-align: left; width: 100%;
+  background: var(--surface); border: 0; border-radius: 16px; padding: 14px 18px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.job:hover { transform: scale(1.006); box-shadow: 0 10px 28px -10px rgba(0,0,0,.18); }
+.job .no { font-weight: 700; font-size: 19px; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.job .no small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: 0; }
+.job .main { min-width: 0; display: grid; gap: 2px; }
+.job .cust { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job .desc { color: var(--muted); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job .meta { color: var(--muted); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.job .side { display: grid; justify-items: end; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 980px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.age { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.age.late { color: var(--st-late); font-weight: 600; }
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); background: var(--surface); border-radius: 18px; }
+.skeleton { height: 76px; border-radius: 16px; background: linear-gradient(90deg, var(--surface) 0%, color-mix(in srgb, var(--fg) 5%, var(--surface)) 50%, var(--surface) 100%); background-size: 200% 100%; animation: sh 1.2s infinite linear; }
+@keyframes sh { to { background-position: -200% 0; } }
+.more { display: flex; justify-content: center; margin-top: 16px; }
+
+/* ---- dialog ---- */
+dialog { border: 0; padding: 0; background: var(--surface); color: var(--fg); width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); }
+.dlg { display: flex; flex-direction: column; max-height: calc(100dvh - 24px); }
+.dlg-head { padding: 20px 22px 16px; display: flex; gap: 14px; align-items: flex-start; }
+.dlg-head .t { min-width: 0; flex: 1; display: grid; gap: 6px; }
+.dlg-title { margin: 0; overflow-wrap: anywhere; }
+.dlg-sub { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.x { width: 34px; height: 34px; cursor: pointer; display: grid; place-items: center; flex: none; }
+.x svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; }
+.dlg-body { padding: 18px 22px 22px; overflow-y: auto; display: grid; gap: 20px; }
+.dlg-foot { padding: 14px 22px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.btn { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: start; position: relative; padding-bottom: 16px; }
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li::before { content: ""; position: absolute; left: 10px; top: 20px; bottom: 0; width: 2px; background: var(--line); }
+.timeline li:last-child::before { display: none; }
+.timeline .mk { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); position: relative; z-index: 1; }
+.timeline li.done .mk { background: var(--primary); border-color: var(--primary); }
+.timeline li.done .mk::after { content: ""; position: absolute; left: 6px; top: 3px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; rotate: 45deg; }
+.timeline li.done::before { background: var(--primary); }
+.timeline .lb { font-weight: 600; }
+.timeline .lb small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.timeline .dt { color: var(--muted); font-size: 13.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.timeline li.done .dt { color: var(--fg); }
+
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-radius: 14px; overflow: hidden; background: var(--surface-2); }
+.facts div { padding: 10px 14px; display: grid; gap: 1px; min-width: 0; }
+.facts dt { font-size: 12px; color: var(--muted); }
+.facts dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .job { grid-template-columns: minmax(0, 1fr) auto; }
+  .job .no { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 8px; }
+  .job .no small { display: inline; }
+  .facts { grid-template-columns: 1fr; }
+  .tag div { min-width: 70px; }
+}
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 20px; opacity: 0; background: var(--fg); color: var(--bg); z-index: 100; pointer-events: none; transition: opacity .2s, translate .2s; max-width: calc(100vw - 32px); }
+#toast.show { opacity: 1; translate: -50% 0; }
+#toast.bad { background: #d70015; color: #fff; }
+.preview-note { color: var(--muted); font-size: 13px; }
+.preview-note .wrap { padding-block: 8px; }
+@media (prefers-reduced-motion: reduce) { .job, .skeleton { transition: none; animation: none; } }
+</style>
+<?!= include('Theme') ?>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <a class="backlink" data-nav="home" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>หน้าหลัก</a>
+      <div class="eyebrow">NDT-B · Received and Return Machines Job</div>
+      <h1>Job Tracker</h1>
+      <p>ติดตามงานรับ–คืนเครื่องจากชีตงานของทีม ค้นหาด้วย Job No. ลูกค้า หรือรุ่นเครื่อง</p>
+    </div>
+    <div class="tag" aria-label="สรุปงาน">
+      <div><b id="sOpen">–</b><span>งานค้าง</span></div>
+      <div class="late"><b id="sLate">–</b><span>ค้างเกิน 30 วัน</span></div>
+      <div><b id="sDone">–</b><span>เสร็จปีนี้</span></div>
+    </div>
+  </div>
+</header>
+<div class="preview-note" id="previewNote" hidden><div class="wrap">โหมดตัวอย่าง: ข้อมูลงานตัวอย่าง ไม่ใช่ข้อมูลจริง — ในเว็บแอปจริงจะอ่านจากชีต “Received and Return Machines Job of NDT-B”</div></div>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="ค้นหา Job No., ลูกค้า, ผู้ใช้, รุ่น, S/N" aria-label="ค้นหางาน" autocomplete="off">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="กรองตามสถานะ"></div>
+    <div class="selects">
+      <select id="fYear" aria-label="ปี"></select>
+      <select id="fPerson" aria-label="Engineer / Sales"><option value="">ทุกคน</option></select>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="resultline" id="resultline"></div>
+    <div class="list" id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="more" id="moreWrap" hidden><button class="btn" type="button" id="moreBtn">แสดงเพิ่ม</button></div>
+  </div>
+</main>
+<footer class="wrap" style="padding-block:0 28px">NDT-B Service Portal V1.03 · Job Tracker</footer>
+
+<dialog id="dlg" aria-labelledby="dTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="t">
+        <div id="dPill"></div>
+        <h2 class="dlg-title" id="dTitle"></h2>
+        <div class="dlg-sub" id="dSub"></div>
+      </div>
+      <button class="x" type="button" id="dClose" aria-label="ปิด"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <ol class="timeline" id="dTimeline"></ol>
+      <dl class="facts" id="dFacts"></dl>
+    </div>
+    <div class="dlg-foot">
+      <a class="btn" id="dSheet" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>เปิดแถวในชีต</a>
+      <a class="btn primary" id="dReq" data-nav="request" href="request.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12h6M10 16h6"/></svg>เปิดใบ Request</a>
+    </div>
+  </div>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>var APP_URL = <?= appUrl ?>;</script>
+<?!= include('Nav') ?>
+<script>
+(function () {
+  'use strict';
+  const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const PAGE = 60;
+
+  // ---------- ข้อมูลตัวอย่าง (โหมดตัวอย่างเท่านั้น — สมมติขึ้น ไม่ใช่งานจริง) ----------
+  function sample() {
+    const T = '2026-11-02';
+    const mk = (no, rec, st, cust, desc, eng, extra) => Object.assign({ tab: '2026', gid: 0, row: 0, no: '', jobNo: String(no), received: rec, quoteDate: '', quoteNo: '', poDate: '', poNo: '', sentOut: '', backFromSupplier: '', status: st, price: '', sales: 'Mr.Example', engineer: eng, customer: cust, user: 'K.Example', desc: desc, location: 'Customer', qty: '1', vendor: '', returned: '', picReceive: eng, picReturn: '' }, extra || {});
+    const jobs = [
+      mk(2330, '2026-10-30', 'Receiving', 'ตัวอย่าง Electronics Co., Ltd.', 'KIKUSUI Withstanding voltage tester TOS9301 S/N : AB000001', 'Mr.Engineer A'),
+      mk(2329, '2026-10-21', 'Calibration', 'ตัวอย่าง Automotive Co., Ltd.', 'RION Sound level meter NL-52 S/N : 00000002', 'Mr.Engineer B', { quoteDate: '2026-10-22', quoteNo: 'RSQ-EX-0002', price: '12,000', poDate: '2026-10-24', poNo: 'PO-EX-02', sentOut: '2026-10-25' }),
+      mk(2328, '2026-09-15', 'Waiting spare parts', 'ตัวอย่าง Textile Co., Ltd.', 'SUGA Xenon weather meter controller S/N : EX000003', 'Mr.Engineer A', { quoteDate: '2026-09-18', quoteNo: 'RSQ-EX-0003', price: '85,000', poDate: '2026-09-25', poNo: 'PO-EX-03', sentOut: '2026-09-28' }),
+      mk(2327, '2026-09-02', 'Waiting Customer p/o', 'ตัวอย่าง Precision Co., Ltd.', 'IWATSU Oscilloscope DS-5654 S/N : EX000004', 'Mr.Engineer C', { quoteDate: '2026-09-05', quoteNo: 'RSQ-EX-0004', price: '23,500' }),
+      mk(2326, '2026-08-20', 'Finished repair', 'ตัวอย่าง Lighting Co., Ltd.', 'Kikusui PWR401MH S/N : EX000005', 'Mr.Engineer B', { quoteDate: '2026-08-21', quoteNo: 'RSQ-EX-0005', price: '7,000', poDate: '2026-08-24', poNo: 'PO-EX-05', sentOut: '2026-08-25', backFromSupplier: '2026-09-20', returned: '2026-09-23', picReturn: 'Mr.Engineer B' }),
+      mk(2325, '2026-08-11', 'Finished calibration', 'ตัวอย่าง Plastic Co., Ltd.', 'RION Sound calibrator NC-75 S/N : EX000006', 'Mr.Engineer A', { price: '3,500', sentOut: '2026-08-12', backFromSupplier: '2026-08-26', returned: '2026-08-28', picReturn: 'Mr.Engineer A' }),
+      mk(2324, '2026-07-30', 'Cancel', 'ตัวอย่าง Motor Co., Ltd.', 'Peeling force tester NPT-300 S/N : EX000007', 'Mr.Engineer C', { returned: '2026-08-05' }),
+      mk(2323, '2026-07-12', 'Inspection', 'ตัวอย่าง Medical Co., Ltd.', 'NF Frequency response analyzer FRA5097 S/N : EX000008', 'Mr.Engineer B', { sentOut: '2026-07-14' })
+    ];
+    return { jobs, tabs: ['2026', '2025'], loaded: ['2026', '2025'], bookUrl: '#', today: T };
+  }
+
+  function api(fn, ...args) {
+    if (!HAS_GAS) return new Promise(r => setTimeout(() => r(sample()), 300));
+    return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+  }
+  function msgOf(err) { return String((err && (err.message || err)) || 'เกิดข้อผิดพลาด').replace(/^Exception:\s*/, ''); }
+
+  // ---------- helpers ----------
+  const clean = s => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  function toISO(v) {
+    v = clean(v); if (!v) return '';
+    let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v); if (m) return v;
+    m = /^(\d{1,2})[\s\-\/]([A-Za-z]{3})[a-z]*[\s\-\/,]*(\d{2,4})$/.exec(v);
+    if (m) { const mi = MONTHS.findIndex(x => x.toLowerCase() === m[2].toLowerCase()); if (mi >= 0) { let y = +m[3]; if (y < 100) y += 2000; return y + '-' + String(mi + 1).padStart(2, '0') + '-' + String(+m[1]).padStart(2, '0'); } }
+    m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(v); if (m) return m[3] + '-' + String(+m[2]).padStart(2, '0') + '-' + String(+m[1]).padStart(2, '0');
+    return '';
+  }
+  function fmtDate(v) { const iso = toISO(v); if (!iso) return clean(v); const [y, mo, d] = iso.split('-'); return (+d) + ' ' + MONTHS[+mo - 1] + ' ' + y; }
+  function days(a, b) { const A = toISO(a), B = toISO(b); if (!A || !B) return null; return Math.round((Date.parse(B) - Date.parse(A)) / 86400000); }
+  const fmtJob = n => /^\d{4,}$/.test(n) ? Number(n).toLocaleString('en-US') : n;
+
+  // สถานะในชีตพิมพ์หลายแบบ → จัดกลุ่ม
+  const BUCKETS = [
+    { k: 'recv', label: 'รับเครื่อง', color: 'var(--st-recv)' },
+    { k: 'work', label: 'กำลังดำเนินการ', color: 'var(--st-work)' },
+    { k: 'wait', label: 'รอ', color: 'var(--st-wait)' },
+    { k: 'done', label: 'เสร็จแล้ว', color: 'var(--st-done)' },
+    { k: 'cancel', label: 'ยกเลิก', color: 'var(--st-cancel)' }
+  ];
+  function bucket(j) {
+    const s = clean(j.status).toLowerCase();
+    if (/cancel/.test(s)) return 'cancel';
+    if (/^fini|^finis|return to customer|^done|complete|can ?not repair/.test(s)) return 'done';
+    if (/wait/.test(s)) return 'wait';
+    if (/receiv/.test(s)) return 'recv';
+    if (/repair|calib|inspect|re&cal|re-cal|check/.test(s)) return 'work';
+    if (j.returned) return 'done';
+    return 'recv';
+  }
+  const isOpen = j => j._b !== 'done' && j._b !== 'cancel';
+  const B = k => BUCKETS.find(b => b.k === k);
+  function statusText(j) { const s = clean(j.status); return s && !/^please select$/i.test(s) ? s : B(j._b).label; }
+
+  // ---------- state ----------
+  const state = { data: null, jobs: [], q: '', bucket: 'open', year: '', person: '', shown: PAGE, today: '' };
+
+  function prepare(res) {
+    state.data = res; state.today = res.today || new Date().toISOString().slice(0, 10);
+    state.jobs = (res.jobs || []).map(j => {
+      j._b = bucket(j);
+      j._recv = toISO(j.received);
+      j._age = isOpen(j) ? days(j.received, state.today) : null;
+      j._search = [j.jobNo, j.customer, j.user, j.desc, j.engineer, j.sales, j.status, j.quoteNo, j.poNo, j.location].join(' ').toLowerCase();
+      return j;
+    }).sort((a, b) => (+b.jobNo) - (+a.jobNo));
+    // ปี
+    const years = res.loaded || [];
+    $('#fYear').innerHTML = '<option value="">ปี ' + esc(years.join(' + ')) + '</option>' +
+      years.map(y => '<option value="' + esc(y) + '">' + esc(y) + '</option>').join('') +
+      ((res.tabs || []).length > years.length ? '<option value="__all">โหลดทุกปี (' + esc(res.tabs.at(-1)) + '–)</option>' : '');
+    $('#fYear').value = state.year && years.includes(state.year) ? state.year : '';
+    // คน
+    const people = [...new Set(state.jobs.flatMap(j => [clean(j.engineer), clean(j.sales)]).filter(Boolean))].sort();
+    $('#fPerson').innerHTML = '<option value="">ทุกคน</option>' + people.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join('');
+    $('#fPerson').value = people.includes(state.person) ? state.person : '';
+    // สรุป (ปีล่าสุด)
+    const thisYear = years[0];
+    const open = state.jobs.filter(isOpen);
+    $('#sOpen').textContent = open.length;
+    $('#sLate').textContent = open.filter(j => j._age != null && j._age > 30).length;
+    $('#sDone').textContent = state.jobs.filter(j => j.tab === thisYear && j._b === 'done').length;
+    render();
+  }
+
+  function filtered(ignoreBucket) {
+    const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    return state.jobs.filter(j =>
+      (!state.year || j.tab === state.year) &&
+      (!state.person || clean(j.engineer) === state.person || clean(j.sales) === state.person) &&
+      (ignoreBucket || state.bucket === 'all' || (state.bucket === 'open' ? isOpen(j) : j._b === state.bucket)) &&
+      words.every(w => j._search.includes(w) || j.jobNo === w.replace(/,/g, '')));
+  }
+
+  function renderChips() {
+    const base = filtered(true);
+    const items = [{ k: 'open', label: 'งานค้าง', n: base.filter(isOpen).length }]
+      .concat(BUCKETS.map(b => ({ k: b.k, label: b.label, color: b.color, n: base.filter(j => j._b === b.k).length })))
+      .concat([{ k: 'all', label: 'ทั้งหมด', n: base.length }]);
+    $('#chips').innerHTML = items.map(i => '<button class="chip" type="button" data-b="' + i.k + '" aria-pressed="' + (state.bucket === i.k) + '">' +
+      (i.color ? '<span class="dot" style="background:' + i.color + '"></span>' : '') + esc(i.label) + ' <span class="n">' + i.n + '</span></button>').join('');
+  }
+
+  function render() {
+    renderChips();
+    const list = filtered();
+    const shown = list.slice(0, state.shown);
+    const filters = [state.q && '“' + state.q + '”', state.year && 'ปี ' + state.year, state.person].filter(Boolean);
+    $('#resultline').innerHTML = '<span>' + list.length + ' งาน' + (filters.length ? ' · ' + esc(filters.join(' · ')) : '') + '</span>' +
+      (filters.length || state.bucket !== 'open' ? '<button type="button" id="clearBtn">ล้างตัวกรอง</button>' : '');
+    $('#list').innerHTML = shown.length ? shown.map(row).join('') :
+      '<div class="empty">ไม่พบงานที่ตรงกับตัวกรอง' + (state.q && /^\d+$/.test(state.q) && state.data && state.data.loaded.length < state.data.tabs.length ? '<br>ลองเลือก “โหลดทุกปี” เพื่อค้นหางานเก่า' : '') + '</div>';
+    $('#moreWrap').hidden = list.length <= state.shown;
+  }
+
+  function row(j) {
+    const b = B(j._b);
+    const age = j._age != null ? '<span class="age' + (j._age > 30 ? ' late' : '') + '">ค้าง ' + j._age + ' วัน</span>' : (j.returned ? '<span class="age">คืน ' + esc(fmtDate(j.returned)) + '</span>' : '');
+    const who = [clean(j.engineer), clean(j.sales)].filter(Boolean).join(' · ');
+    return '<button class="job" type="button" data-job="' + esc(j.jobNo) + '" data-tab="' + esc(j.tab) + '">' +
+      '<div class="no">' + esc(fmtJob(j.jobNo)) + '<small>' + esc(fmtDate(j.received) || '–') + '</small></div>' +
+      '<div class="main"><div class="cust">' + esc(clean(j.customer) || '—') + '</div><div class="desc">' + esc(clean(j.desc)) + '</div>' +
+      '<div class="meta">' + (who ? '<span>' + esc(who) + '</span>' : '') + (j.price ? '<span>' + esc(j.price) + ' บาท</span>' : '') + (j.location ? '<span>อยู่ที่ ' + esc(j.location) + '</span>' : '') + '</div></div>' +
+      '<div class="side"><span class="pill" style="--c:' + b.color + '">' + esc(statusText(j)) + '</span>' + age + '</div>' +
+      '</button>';
+  }
+
+  function openJob(no, tab) {
+    const j = state.jobs.find(x => x.jobNo === no && x.tab === tab); if (!j) return;
+    const b = B(j._b);
+    $('#dPill').innerHTML = '<span class="pill" style="--c:' + b.color + '">' + esc(statusText(j)) + '</span>';
+    $('#dTitle').textContent = 'Job No. ' + fmtJob(j.jobNo) + ' · ' + (clean(j.customer) || '—');
+    $('#dSub').textContent = clean(j.desc);
+    const steps = [
+      ['รับเครื่องจากลูกค้า', j.received, j.picReceive && 'โดย ' + j.picReceive],
+      ['เสนอราคา', j.quoteDate, [j.quoteNo, j.price && j.price + ' บาท'].filter(Boolean).join(' · ')],
+      ['ลูกค้าออก PO', j.poDate, j.poNo],
+      ['ส่งไป Supplier', j.sentOut, j.location && j.location !== 'Customer' ? j.location : ''],
+      ['รับคืนจาก Supplier', j.backFromSupplier, ''],
+      ['คืนเครื่องให้ลูกค้า', j.returned, j.picReturn && 'โดย ' + j.picReturn]
+    ];
+    $('#dTimeline').innerHTML = steps.map(s => {
+      const has = !!clean(s[1]) || (!!clean(s[2]) && s[0] !== 'ส่งไป Supplier');
+      return '<li class="' + (has ? 'done' : '') + '"><span class="mk"></span><div class="lb">' + esc(s[0]) + (s[2] ? '<small>' + esc(s[2]) + '</small>' : '') + '</div><div class="dt">' + esc(fmtDate(s[1]) || (has ? '' : '–')) + '</div></li>';
+    }).join('');
+    const facts = [['ผู้ใช้', j.user], ['Engineer', j.engineer], ['Sales', j.sales], ['เครื่องอยู่ที่', j.location], ['Vendor', j.vendor], ['จำนวน', j.qty],
+      ['ระยะเวลา', j._age != null ? 'ค้าง ' + j._age + ' วัน' : (days(j.received, j.returned) != null ? days(j.received, j.returned) + ' วัน (รับ → คืน)' : '')], ['แท็บในชีต', j.tab + (j.row ? ' · แถว ' + j.row : '')]]
+      .filter(f => clean(f[1]));
+    $('#dFacts').innerHTML = facts.map(f => '<div><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></div>').join('');
+    const url = state.data.bookUrl && state.data.bookUrl !== '#' ? state.data.bookUrl + '#gid=' + j.gid + '&range=A' + j.row : '#';
+    $('#dSheet').href = url; $('#dSheet').hidden = url === '#';
+    const href = window.navHref ? window.navHref('request', { job: j.jobNo }) : 'request.html?job=' + j.jobNo;
+    $('#dReq').href = href; if (HAS_GAS) $('#dReq').target = '_top';
+    $('#dlg').showModal();
+  }
+
+  // ---------- events ----------
+  $('#q').addEventListener('input', e => { state.q = e.target.value.trim(); state.shown = PAGE; if (/^\d{4,}$/.test(state.q)) state.bucket = 'all'; render(); });
+  $('#chips').addEventListener('click', e => { const b = e.target.closest('[data-b]'); if (!b) return; state.bucket = b.dataset.b; state.shown = PAGE; render(); });
+  $('#fPerson').addEventListener('change', e => { state.person = e.target.value; state.shown = PAGE; render(); });
+  $('#fYear').addEventListener('change', e => {
+    if (e.target.value === '__all') { load('all'); return; }
+    state.year = e.target.value; state.shown = PAGE; render();
+  });
+  $('#list').addEventListener('click', e => { const b = e.target.closest('.job'); if (b) openJob(b.dataset.job, b.dataset.tab); });
+  $('#resultline').addEventListener('click', e => { if (e.target.id === 'clearBtn') { state.q = ''; $('#q').value = ''; state.year = ''; state.person = ''; state.bucket = 'open'; $('#fYear').value = ''; $('#fPerson').value = ''; render(); } });
+  $('#moreBtn').addEventListener('click', () => { state.shown += PAGE; render(); });
+  $('#dClose').addEventListener('click', () => $('#dlg').close());
+  $('#dlg').addEventListener('click', e => { if (e.target === $('#dlg')) $('#dlg').close(); });
+
+  let tt;
+  function toast(m, bad) { const t = $('#toast'); t.textContent = m; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 3200); }
+
+  function load(years) {
+    $('#list').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    api('getJobs', years || 2).then(prepare).catch(err => {
+      $('#list').innerHTML = '<div class="empty"><b>โหลดข้อมูลงานไม่สำเร็จ</b><br>' + esc(msgOf(err)) + '<br><small>ตรวจว่าบัญชีที่รันเว็บแอปมีสิทธิ์เปิดชีตงาน</small></div>';
+    });
+  }
+
+  $('#previewNote').hidden = !!HAS_GAS;
+  window.appParams && window.appParams(p => { if (p.q) { state.q = p.q; $('#q').value = p.q; state.bucket = 'all'; } load(2); });
+  if (!window.appParams) load(2);
+})();
+</script>

@@ -1,6 +1,6 @@
 <style>
 /* ============================================================
-   Theme — NDT-B Service Portal V1.02  (Apple-style look)
+   Theme — NDT-B Service Portal V1.03  (Apple-style look)
    ใส่หลัง <style> ของแต่ละหน้า (include('Theme')) จึงทับค่าเดิมได้
    ไม่แตะใบพิมพ์ A4 (.sheet / --paper-*) — ใบพิมพ์ยังเหมือนฟอร์มเดิม
    ============================================================ */
@@ -134,7 +134,7 @@
   .door .go { border-top: 0; padding-top: 4px; color: var(--primary); font-weight: 500; font-size: 16px; justify-content: flex-start; gap: 10px; }
   .door .go::after { content: "›"; font-size: 22px; line-height: 1; order: 1; }
   .door .go small { order: 2; margin-left: auto; font-family: var(--font-body); }
-  .doors { gap: 20px; }
+  .doors { gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
   .plate { background: #ffffff; border-bottom: 1px solid var(--hairline); }
   .plate::before, .plate::after { display: none; }

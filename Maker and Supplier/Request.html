@@ -336,7 +336,7 @@ form { display: grid; gap: 14px; min-width: 0; }
   </div>
 </main>
 
-<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.02 · Request Check Sheet</footer>
+<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.03 · Request Check Sheet</footer>
 <div id="printRoot" aria-hidden="true"></div>
 <datalist id="makerList"></datalist>
 <datalist id="customerList"></datalist>
@@ -482,7 +482,7 @@ form { display: grid; gap: 14px; min-width: 0; }
   function jobHint() {
     const v = $('#f_jobNo').value.trim();
     const exists = v && state.recent.some(r => r.jobNo === v);
-    $('#jobHint').textContent = exists ? 'มีใบนี้แล้ว — บันทึกจะเขียนทับใบเดิม' : (state.nextJobNo ? 'เลขถัดไปจากที่บันทึกไว้: ' + state.nextJobNo : '');
+    $('#jobHint').textContent = exists ? 'มีใบนี้แล้ว — บันทึกจะเขียนทับใบเดิม' : (state.nextJobNo ? 'เลขถัดไปต่อจากชีตงาน: ' + state.nextJobNo : '');
     $('#jobHint').classList.toggle('warn', !!exists);
     $('#tagJob').textContent = v ? fmtJob(v) : '–';
   }
@@ -589,7 +589,8 @@ form { display: grid; gap: 14px; min-width: 0; }
       const res = await api('saveRequest', d);
       setInit(res.init);
       state.lastSaved = JSON.stringify(d); markDirty();
-      toast((res.updated ? 'อัปเดตใบ Job No. ' : 'บันทึกใบ Job No. ') + fmtJob(res.jobNo) + ' แล้ว');
+      const jb = res.jobBook || {};
+      toast((res.updated ? 'อัปเดตใบ Job No. ' : 'บันทึกใบ Job No. ') + fmtJob(res.jobNo) + ' แล้ว' + (jb.ok ? (jb.created ? ' · เพิ่มงานในชีตงาน (แท็บ ' + jb.tab + ') แล้ว' : (jb.filled && jb.filled.length ? ' · เติมข้อมูลในชีตงานแล้ว' : ' · ชีตงานมีข้อมูลครบแล้ว')) : (jb.reason ? ' · ลงชีตงานไม่สำเร็จ: ' + jb.reason : '')), jb.ok === false && !!jb.reason);
       if (lineOn()) sendLine(d);
       return d;
     } catch (err) { toast(msgOf(err), true); throw err; }
@@ -656,7 +657,7 @@ form { display: grid; gap: 14px; min-width: 0; }
   async function openJob(no) {
     no = String(no || '').trim(); if (!no) return;
     $('#openBtn').disabled = true;
-    try { const d = await api('getRequest', no); writeForm(d); state.lastSaved = JSON.stringify(readForm()); markDirty(); $('#openJob').value = ''; toast('เปิดใบ Job No. ' + fmtJob(no) + ' แล้ว'); showErr(''); }
+    try { const d = await api('getRequest', no); writeForm(d); state.lastSaved = JSON.stringify(readForm()); markDirty(); $('#openJob').value = ''; toast(d._fromJobBook ? 'ดึงข้อมูล Job No. ' + fmtJob(no) + ' จากชีตงาน — ตรวจ/เติมข้อมูลแล้วกดบันทึก' : 'เปิดใบ Job No. ' + fmtJob(no) + ' แล้ว'); showErr(''); }
     catch (err) { toast(msgOf(err), true); }
     finally { $('#openBtn').disabled = false; }
   }

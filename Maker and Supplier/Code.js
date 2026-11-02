@@ -1,5 +1,5 @@
 /**
- * NDT-B Service Portal  V1.02  (2 พ.ย. 2026) — ธีมแบบ Apple (Theme.html)
+ * NDT-B Service Portal  V1.03  (2 พ.ย. 2026) — เชื่อมชีตงาน + Job Tracker (JobBook.gs, Jobs.html)
  * หน้าหลัก → (1) Maker Directory  (2) Request Check Sheet (Receive / Return) พิมพ์เป็น PDF
  *
  * ผูกสคริปต์นี้กับสเปรดชีต "Contact Maker and Supplier" (Extensions → Apps Script)
@@ -9,7 +9,7 @@
  */
 
 // ======================= ค่าคงที่ =======================
-var APP_VERSION = 'V1.02';
+var APP_VERSION = 'V1.03';
 var MAKER_SHEET_NAME = 'ชีต1';           // ถ้าไม่เจอชื่อนี้ จะใช้แท็บแรกของไฟล์
 var REQ_SHEET_NAME = 'RequestCheckSheet';
 var STAFF_SHEET_NAME = 'Staff';
@@ -44,8 +44,8 @@ var PDF_FOLDER_PROP = 'PDF_FOLDER_ID';
 // ======================= Web app =======================
 function doGet(e) {
   var page = (e && e.parameter && e.parameter.page) || 'home';
-  var file = { home: 'Home', makers: 'Makers', request: 'Request' }[page] || 'Home';
-  var title = { Home: 'NDT-B Service Portal', Makers: 'Maker Directory', Request: 'Request Check Sheet' }[file];
+  var file = { home: 'Home', makers: 'Makers', request: 'Request', jobs: 'Jobs' }[page] || 'Home';
+  var title = { Home: 'NDT-B Service Portal', Makers: 'Maker Directory', Request: 'Request Check Sheet', Jobs: 'Job Tracker' }[file];
   var t = HtmlService.createTemplateFromFile(file);
   t.appUrl = ScriptApp.getService().getUrl();
   return t.evaluate()
@@ -270,7 +270,7 @@ function getRequestInit() {
   return {
     makers: readMakerRows_(),
     staff: readStaff_(),
-    nextJobNo: maxNo ? String(Math.floor(maxNo) + 1) : '',
+    nextJobNo: (function () { var m = Math.max(Math.floor(maxNo) || 0, jobBookMaxNo_()); return m ? String(m + 1) : ''; })(),
     customers: Object.keys(customers).map(function (k) { return customers[k]; }),
     recent: list.slice(-30).reverse().map(summary_),
     lineEnabled: lineReady_()
@@ -302,7 +302,11 @@ function getRequest(jobNo) {
   jobNo = str_(jobNo);
   var hit = null;
   readRequests_().forEach(function (r) { if (r.jobNo === jobNo) hit = r; });
-  if (!hit) throw new Error('ไม่พบใบ Job No. ' + jobNo);
+  if (!hit) {
+    var job = null; try { job = findJob_(jobNo); } catch (e) {}
+    if (job) return jobToRequest_(job);
+    throw new Error('ไม่พบ Job No. ' + jobNo + ' ทั้งในใบที่บันทึกและในชีตงาน');
+  }
   if (!hit.data) throw new Error('ใบ Job No. ' + jobNo + ' ไม่มีข้อมูลสำหรับเปิดซ้ำ (คอลัมน์ Data ว่าง)');
   return hit.data;
 }
@@ -330,7 +334,8 @@ function saveRequest(d) {
     ].map(function (v) { return v instanceof Date ? v : safeCell_(v); });
     if (existing) sh.getRange(existing.row, 1, 1, row.length).setValues([row]);
     else sh.appendRow(row);
-    return { jobNo: jobNo, updated: !!existing, init: getRequestInit() };
+    var jb; try { jb = syncJobBook_(d); } catch (e) { jb = { ok: false, reason: String(e.message || e) }; }
+    return { jobNo: jobNo, updated: !!existing, jobBook: jb, init: getRequestInit() };
   });
 }
 
