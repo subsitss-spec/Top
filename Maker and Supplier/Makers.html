@@ -1,0 +1,900 @@
+<title>Maker Directory</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: navy instrument-panel masthead → sticky toolbar → grid of "nameplate" cards; details and forms open in dialogs */
+:root {
+  --bg: #eef1f3;
+  --surface: #ffffff;
+  --surface-2: #f5f7f8;
+  --fg: #14212b;
+  --muted: #5a6b78;
+  --line: #d5dde3;
+  --ink: #0f2a3d;          /* masthead / primary */
+  --ink-fg: #eaf1f6;
+  --accent: #f2b705;       /* calibration-tag yellow, used sparingly */
+  --accent-ink: #231a00;
+  --primary: #12466b;
+  --primary-fg: #ffffff;
+  --danger: #b8382b;
+  --danger-bg: #fbeceb;
+  --plate: #ffffff;        /* logos are designed for white; plate stays white in both themes */
+  --plate-line: #e2e5e3;
+  --screw: #c9cfd3;
+  --m1: #1f4e6e; --m2: #6a4c2c; --m3: #2f5d4a; --m4: #5a3f6b; --m5: #6b2f35;
+  --shadow: 0 1px 2px rgba(15,42,61,.06), 0 6px 18px -10px rgba(15,42,61,.25);
+
+  --font-display: "Chakra Petch", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Sarabun", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c151c; --surface: #13212c; --surface-2: #182a37; --fg: #e4ebf0; --muted: #93a4b1;
+    --line: #24384a; --ink: #08131c; --ink-fg: #e4ebf0; --accent: #f5c22b; --accent-ink: #231a00;
+    --primary: #4c9bd1; --primary-fg: #04121c; --danger: #ef7b6d; --danger-bg: #3a1a17;
+    --plate: #ffffff; --plate-line: #2c4152; --screw: #b9c0c4;
+    --m1: #2b6890; --m2: #8a6440; --m3: #3f7a61; --m4: #7a5a8e; --m5: #8c454c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px -12px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c151c; --surface: #13212c; --surface-2: #182a37; --fg: #e4ebf0; --muted: #93a4b1;
+  --line: #24384a; --ink: #08131c; --ink-fg: #e4ebf0; --accent: #f5c22b; --accent-ink: #231a00;
+  --primary: #4c9bd1; --primary-fg: #04121c; --danger: #ef7b6d; --danger-bg: #3a1a17;
+  --plate: #ffffff; --plate-line: #2c4152; --screw: #b9c0c4;
+  --m1: #2b6890; --m2: #8a6440; --m3: #3f7a61; --m4: #7a5a8e; --m5: #8c454c;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 22px -12px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); }
+body { margin: 0; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+a { color: var(--primary); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* ---- masthead ---- */
+.masthead { background: var(--ink); color: var(--ink-fg); }
+.masthead .wrap { padding-block: 28px 24px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.brand { display: grid; gap: 4px; min-width: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .72; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 5vw, 40px); line-height: 1.05; letter-spacing: .01em; text-wrap: balance; }
+.brand p { margin: 0; opacity: .8; font-size: 15px; }
+.tag { display: flex; align-items: stretch; background: var(--accent); color: var(--accent-ink); border-radius: 6px; font-family: var(--font-mono); font-size: 13px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset; }
+.tag div { padding: 7px 12px; display: grid; line-height: 1.2; }
+.tag div + div { border-left: 1px dashed rgba(35,26,0,.4); }
+.tag b { font-family: var(--font-display); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tag span { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+
+.preview-note { background: var(--surface-2); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.preview-note .wrap { padding-block: 8px; }
+
+/* ---- toolbar ---- */
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.toolbar .wrap { padding-block: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.search { flex: 1 1 260px; min-width: 0; position: relative; }
+.search input { width: 100%; height: 42px; padding: 0 14px 0 38px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+.search svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; width: 17px; height: 17px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip .n { font-family: var(--font-mono); font-size: 12px; opacity: .7; }
+.btn { height: 42px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; white-space: nowrap; text-decoration: none; color: var(--fg); }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.danger { color: var(--danger); }
+.btn.sm { height: 34px; padding: 0 12px; font-size: 13px; }
+.btn[disabled] { opacity: .55; cursor: progress; }
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- grid of nameplates ---- */
+main .wrap { padding-block: 22px 60px; }
+.resultline { color: var(--muted); font-size: 13px; margin-bottom: 14px; font-family: var(--font-mono); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); cursor: pointer; text-align: left; padding: 0; display: flex; flex-direction: column; overflow: hidden; transition: transform .18s ease, box-shadow .18s ease, border-color .18s; min-width: 0; }
+.card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); }
+.plate { --pad-y: 18px; --pad-x: 24px; position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--plate); border-bottom: 1px solid var(--plate-line); display: grid; place-items: center; overflow: hidden; contain: paint; }
+.plate::before, .plate::after { content: ""; position: absolute; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff 0 20%, var(--screw) 21%); box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+.plate::before { left: 9px; } .plate::after { right: 9px; }
+/* the logo always fits inside the plate's inner box, never overflowing it */
+.plate img { position: absolute; max-width: none; max-height: none; z-index: 0; top: var(--pad-y); left: var(--pad-x); width: calc(100% - 2 * var(--pad-x)); height: calc(100% - 2 * var(--pad-y)); object-fit: contain; object-position: center; display: block; }
+.mono { width: 64px; height: 64px; border-radius: 12px; display: grid; place-items: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .02em; }
+.plate .add-logo { position: absolute; right: 8px; bottom: 8px; font-size: 11px; font-family: var(--font-mono); color: #5a6b78; background: rgba(255,255,255,.85); border: 1px dashed #b7c1c8; border-radius: 6px; padding: 2px 7px; }
+.card-body { position: relative; z-index: 1; background: var(--surface); padding: 13px 15px 15px; display: grid; gap: 8px; }
+.card-name { font-family: var(--font-display); font-weight: 600; font-size: 16.5px; line-height: 1.25; text-wrap: balance; overflow-wrap: anywhere; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.cc { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .06em; padding: 2px 7px; border-radius: 4px; border: 1px solid var(--line); color: var(--fg); background: var(--surface-2); }
+.dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); opacity: .6; }
+.domain { font-family: var(--font-mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.empty { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 40px 20px; text-align: center; color: var(--muted); display: grid; gap: 12px; justify-items: center; }
+.skeleton { height: 220px; border-radius: var(--r); background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%); background-size: 200% 100%; animation: sh 1.2s infinite linear; border: 1px solid var(--line); }
+@keyframes sh { to { background-position: -200% 0; } }
+
+/* ---- dialogs ---- */
+dialog { border: none; padding: 0; border-radius: 14px; background: var(--surface); color: var(--fg); width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-shadow: 0 30px 80px -20px rgba(0,0,0,.5); }
+dialog::backdrop { background: rgba(8,19,28,.55); backdrop-filter: blur(2px); }
+.dlg { display: flex; flex-direction: column; max-height: calc(100dvh - 24px); }
+.dlg-head { padding: 18px 20px; border-bottom: 1px solid var(--line); display: flex; gap: 16px; align-items: flex-start; }
+.dlg-body { padding: 18px 20px; overflow-y: auto; display: grid; gap: 16px; }
+.dlg-foot { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; background: var(--surface-2); border-radius: 0 0 14px 14px; }
+.x { margin-left: auto; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; flex: none; display: grid; place-items: center; }
+.x svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+.dlg-title { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1.2; margin: 0; overflow-wrap: anywhere; }
+
+.d-head { display: flex; gap: 16px; align-items: center; flex: 1; min-width: 0; flex-wrap: wrap; }
+.d-plate { --pad-y: 12px; --pad-x: 14px; width: 170px; aspect-ratio: 16/10; border-radius: 10px; border: 1px solid var(--plate-line); flex: none; }
+.d-plate::before, .d-plate::after { top: 7px; width: 6px; height: 6px; }
+.d-plate::before { left: 7px; } .d-plate::after { right: 7px; }
+.d-plate .mono { width: 52px; height: 52px; font-size: 18px; }
+.d-info { display: grid; gap: 8px; min-width: 0; flex: 1 1 220px; }
+.linkrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.logo-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+.contact { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.contact-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.contact-label { font-family: var(--font-display); font-weight: 600; font-size: 14.5px; }
+.contact-label small { font-family: var(--font-mono); font-weight: 400; color: var(--muted); font-size: 11px; margin-left: 6px; }
+.contact-head .acts { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.tel { padding: 10px 14px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-family: var(--font-mono); font-size: 13.5px; }
+.people { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0; }
+.person { padding: 12px 14px 14px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.person + .person { border-left: 1px dashed var(--line); }
+@media (max-width: 560px) { .person + .person { border-left: none; border-top: 1px dashed var(--line); } }
+.role { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.pname { font-weight: 600; overflow-wrap: anywhere; }
+.none { color: var(--muted); font-style: italic; font-size: 13.5px; }
+.emails { display: grid; gap: 4px; }
+.email { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.email a { font-family: var(--font-mono); font-size: 13px; overflow-wrap: anywhere; min-width: 0; text-decoration: none; }
+.email a:hover { text-decoration: underline; }
+.copy { flex: none; width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; color: var(--muted); }
+.copy svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2; fill: none; }
+.copy.ok { color: var(--primary); border-color: var(--primary); }
+.confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px; background: var(--danger-bg); color: var(--danger); font-size: 13.5px; }
+
+/* ---- form ---- */
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+@media (max-width: 600px) { .fgrid { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 5px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label, .flabel { font-size: 13px; font-weight: 500; }
+.flabel small, .field label small { color: var(--muted); font-weight: 400; }
+.cpick { display: flex; flex-wrap: wrap; gap: 6px; }
+.cpick button { height: 36px; padding: 0 12px 0 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; }
+.cpick button .box { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--muted); display: grid; place-items: center; }
+.cpick button[aria-pressed="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--surface)); }
+.cpick button[aria-pressed="true"] .box { background: var(--primary); border-color: var(--primary); }
+.cpick button[aria-pressed="true"] .box::after { content: ""; width: 8px; height: 4px; border: 2px solid var(--primary-fg); border-top: 0; border-right: 0; rotate: -45deg; translate: 0 -1px; }
+.field label small { color: var(--muted); font-weight: 400; }
+.field input, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 9px 11px; min-height: 40px; }
+.field textarea { resize: vertical; min-height: 64px; }
+.field input:focus, .field textarea:focus { outline: 2px solid color-mix(in srgb, var(--primary) 50%, transparent); border-color: var(--primary); }
+.section-label { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding-top: 6px; border-top: 1px solid var(--line); margin-top: 4px; }
+.drop { grid-column: 1 / -1; display: flex; gap: 14px; align-items: center; border: 1.5px dashed var(--line); border-radius: 10px; padding: 12px; cursor: pointer; background: var(--surface-2); flex-wrap: wrap; }
+.drop.over { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--surface)); }
+.drop .plate { --pad-y: 10px; --pad-x: 12px; width: 150px; aspect-ratio: 16/10; border-radius: 8px; border: 1px solid var(--plate-line); flex: none; }
+.drop .plate::before, .drop .plate::after { display: none; }
+.drop .ph { color: #8a98a3; font-size: 12px; text-align: center; }
+.drop-text { display: grid; gap: 4px; font-size: 13.5px; min-width: 0; flex: 1 1 200px; }
+.drop-text small { color: var(--muted); }
+.err { color: var(--danger); font-size: 13.5px; }
+
+/* ---- logo editor ---- */
+#cropDlg { width: min(680px, calc(100vw - 24px)); }
+.stage { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--plate-line); background-color: #fff; touch-action: none; cursor: grab; }
+.stage.dragging { cursor: grabbing; }
+.stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.stage .guide { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 70%, transparent); border-radius: 10px; }
+.stage .hint { position: absolute; left: 10px; bottom: 8px; font-size: 11.5px; font-family: var(--font-mono); color: #5a6b78; background: rgba(255,255,255,.85); padding: 2px 8px; border-radius: 6px; pointer-events: none; }
+.ed-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ed-row label { font-size: 13px; font-weight: 500; min-width: 64px; }
+.ed-row input[type=range] { flex: 1 1 200px; min-width: 0; accent-color: var(--primary); }
+.ed-row output { font-family: var(--font-mono); font-size: 13px; width: 52px; text-align: right; font-variant-numeric: tabular-nums; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 0 12px; height: 34px; cursor: pointer; font-size: 13px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.ed-preview { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+.ed-preview .plate { width: 200px; border: 1px solid var(--plate-line); border-radius: 8px; flex: none; }
+.ed-preview .plate::before, .ed-preview .plate::after { display: none; }
+
+.backlink { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-fg); opacity: .8; text-decoration: none; font-size: 13px; margin-bottom: 6px; width: fit-content; }
+.backlink:hover { opacity: 1; text-decoration: underline; }
+.backlink svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 20px; opacity: 0; background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 100; pointer-events: none; transition: opacity .2s, translate .2s; max-width: calc(100vw - 32px); }
+#toast.show { opacity: 1; translate: -50% 0; }
+#toast.bad { background: var(--danger); color: #fff; }
+
+@media (max-width: 620px) {
+  .toolbar .wrap { gap: 8px; }
+  .search { flex: 1 1 0; }
+  #addBtn { padding: 0 12px; }
+  #addBtn .lbl { display: none; }
+  .chips { order: 3; flex: 1 0 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chip { flex: none; }
+  .masthead .wrap { padding-block: 20px 18px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .card-body { padding: 10px 11px 12px; gap: 6px; }
+  .card-name { font-size: 14.5px; }
+  .plate { --pad-y: 12px; --pad-x: 14px; }
+  .mono { width: 48px; height: 48px; font-size: 17px; border-radius: 10px; }
+  .plate .add-logo { display: none; }
+  .ed-row label { display: none; }
+  .ed-row input[type=range] { flex: 1 1 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <a class="backlink" data-nav="home" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>หน้าหลัก</a>
+      <div class="eyebrow">NDT-B · Service</div>
+      <h1>Maker Directory</h1>
+      <p>รายชื่อผู้ผลิตและซัพพลายเออร์ สำหรับส่งซ่อม สอบเทียบ และสั่งอะไหล่</p>
+    </div>
+    <div class="tag" aria-label="สรุปจำนวน">
+      <div><b id="statMakers">–</b><span>Makers</span></div>
+      <div><b id="statContacts">–</b><span>ผู้ติดต่อ</span></div>
+      <div><b id="statLogos">–</b><span>มีโลโก้</span></div>
+    </div>
+  </div>
+</header>
+<div class="preview-note" id="previewNote" hidden>
+  <div class="wrap">โหมดตัวอย่าง: ข้อมูลจากชีต “Contact Maker and Supplier” ณ 29 ต.ค. 2026 · ลองเพิ่ม/แก้ไข/ใส่โลโก้ได้ แต่ยังไม่บันทึกลงชีตจริง</div>
+</div>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="ค้นหาบริษัท ชื่อผู้ติดต่อ หรืออีเมล" aria-label="ค้นหา" autocomplete="off">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="กรองตามประเทศ"></div>
+    <button class="btn accent" id="addBtn" type="button" aria-label="เพิ่ม Maker">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">เพิ่ม Maker</span>
+    </button>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="resultline" id="resultline"></div>
+    <div class="grid" id="grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+</main>
+<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.01 · Maker Directory</footer>
+
+<!-- รายละเอียด Maker -->
+<dialog id="detailDlg" aria-labelledby="dTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="d-head">
+        <div class="plate d-plate" id="dPlate"></div>
+        <div class="d-info">
+          <h2 class="dlg-title" id="dTitle"></h2>
+          <div class="meta" id="dMeta"></div>
+          <div class="logo-actions">
+            <button class="btn sm" type="button" id="dLogoBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg><span>อัปโหลดโลโก้</span></button>
+            <button class="btn sm" type="button" id="dLogoUrlBtn">ใช้ลิงก์รูป</button>
+            <button class="btn sm" type="button" id="dLogoTrim" hidden>ปรับขนาด / ครอบรูป</button>
+            <button class="btn sm danger" type="button" id="dLogoDel" hidden>เอาโลโก้ออก</button>
+            <input type="file" id="dLogoFile" accept="image/*" hidden>
+          </div>
+          <div class="logo-actions" id="dLogoUrlRow" hidden>
+            <input id="dLogoUrl" type="url" placeholder="https://… (ลิงก์รูปโลโก้)" style="flex:1 1 220px;min-width:0;height:34px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--surface)">
+            <button class="btn sm primary" type="button" id="dLogoUrlSave">ใช้รูปนี้</button>
+          </div>
+        </div>
+      </div>
+      <button class="x" type="button" data-close aria-label="ปิด"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <div class="linkrow" id="dLinks"></div>
+      <div id="dContacts" style="display:grid;gap:12px"></div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" id="dAddContact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>เพิ่มผู้ติดต่อ / แผนก</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ฟอร์มเพิ่ม/แก้ไข -->
+<dialog id="formDlg" aria-labelledby="fTitle">
+  <form class="dlg" id="form" novalidate>
+    <div class="dlg-head">
+      <h2 class="dlg-title" id="fTitle">เพิ่ม Maker</h2>
+      <button class="x" type="button" data-close aria-label="ปิด"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <div class="fgrid">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="เลือกรูปโลโก้">
+          <div class="plate" id="fPlate"><span class="ph">ยังไม่มีโลโก้</span></div>
+          <div class="drop-text">
+            <b>โลโก้ Maker</b>
+            <span>ลากไฟล์รูปมาวาง หรือคลิกเพื่อเลือก (PNG, JPG, SVG, WEBP)</span>
+            <small>เลือกรูปแล้วปรับขนาด/ครอบได้ · คลิกที่รูปตัวอย่างเพื่อปรับอีกครั้ง · ใช้ร่วมกันทุกแผนกของบริษัทเดียวกัน</small>
+          </div>
+          <input type="file" id="fLogoFile" accept="image/*" hidden>
+        </div>
+        <div class="field full"><label for="f_company">ชื่อบริษัท (Company) <small>*</small></label><input id="f_company" list="companyList" required placeholder="เช่น KIKUSUI ELECTRONICS CORP."></div>
+        <div class="field"><span class="flabel" id="cpLabel">ประเทศ (Country) <small>เลือกได้มากกว่า 1</small></span>
+          <input type="hidden" id="f_country">
+          <div class="cpick" id="cPick" role="group" aria-labelledby="cpLabel"></div>
+          <input id="f_countryOther" list="countryList" placeholder="ประเทศอื่น เช่น Germany (คั่นด้วย ,)" aria-label="ประเทศอื่น">
+        </div>
+        <div class="field"><label for="f_tel">โทรศัพท์ / แผนก <small>(Telephone)</small></label><input id="f_tel" placeholder="TEL +81-… หรือ Repair"></div>
+        <div class="field full"><label for="f_website">เว็บไซต์ (Website)</label><input id="f_website" type="url" placeholder="https://"></div>
+        <div class="section-label">ฝ่าย Service</div>
+        <div class="field"><label for="f_servicePic">Service PIC</label><input id="f_servicePic" placeholder="Mr. …"></div>
+        <div class="field"><label for="f_serviceEmail">E-mail <small>(คั่นหลายอีเมลด้วย ; หรือ ,)</small></label><textarea id="f_serviceEmail" rows="2"></textarea></div>
+        <div class="section-label">ฝ่ายขาย</div>
+        <div class="field"><label for="f_salesPic">Sales PIC</label><input id="f_salesPic"></div>
+        <div class="field"><label for="f_salesEmail">E-mail</label><textarea id="f_salesEmail" rows="2"></textarea></div>
+        <div class="section-label">ลิงก์อื่น ๆ</div>
+        <div class="field"><label for="f_techWeb">Technical website</label><input id="f_techWeb" type="url" placeholder="https://"></div>
+        <div class="field"><label for="f_priceLink">New Price machine</label><input id="f_priceLink" type="url" placeholder="https://"></div>
+      </div>
+      <div class="err" id="fErr" hidden></div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" data-close>ยกเลิก</button>
+      <button class="btn primary" type="submit" id="fSave">บันทึก</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ปรับขนาด / ครอบโลโก้ -->
+<dialog id="cropDlg" aria-labelledby="cTitle">
+  <div class="dlg">
+    <div class="dlg-head">
+      <h2 class="dlg-title" id="cTitle">ปรับขนาด / ครอบโลโก้</h2>
+      <button class="x" type="button" id="cClose" aria-label="ปิด"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <div class="stage" id="stage">
+        <canvas id="cCanvas" width="800" height="450" aria-label="พื้นที่ครอบรูป"></canvas>
+        <div class="guide"></div>
+        <div class="hint">ลากเพื่อเลื่อน · เลื่อนเมาส์/ถ่างนิ้วเพื่อซูม</div>
+      </div>
+      <div class="ed-row">
+        <label for="cZoom">ขนาด</label>
+        <button class="btn sm" type="button" id="cZoomOut" aria-label="ย่อ">−</button>
+        <input type="range" id="cZoom" min="10" max="400" step="1" value="100">
+        <button class="btn sm" type="button" id="cZoomIn" aria-label="ขยาย">+</button>
+        <output id="cZoomOut2" for="cZoom">100%</output>
+      </div>
+      <div class="ed-row">
+        <span class="seg" role="group" aria-label="จัดตำแหน่ง">
+          <button type="button" id="cFit" aria-pressed="true">พอดีกรอบ</button>
+          <button type="button" id="cCover" aria-pressed="false">เต็มกรอบ</button>
+        </span>
+        <span class="seg" role="group" aria-label="ขอบขาว">
+          <button type="button" id="cTrimOn" aria-pressed="true">ตัดขอบขาว</button>
+          <button type="button" id="cTrimOff" aria-pressed="false">ใช้รูปเดิม</button>
+        </span>
+        <button class="btn sm" type="button" id="cCenter">จัดกึ่งกลาง</button>
+      </div>
+      <div class="ed-preview">
+        <div class="plate" id="cPreview"></div>
+        <span>หน้าตาบนการ์ด · ส่วนที่อยู่นอกกรอบสีน้ำเงินจะถูกครอบออก</span>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn" type="button" id="cCancel">ยกเลิก</button>
+      <button class="btn primary" type="button" id="cOk">ใช้รูปนี้</button>
+    </div>
+  </div>
+</dialog>
+
+<datalist id="countryList"></datalist>
+<datalist id="companyList"></datalist>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>var APP_URL = <?= appUrl ?>;</script>
+<?!= include('Nav') ?>
+<script>
+/* ข้อมูลตัวอย่าง — ใช้เฉพาะตอนเปิดไฟล์นอก Apps Script (โหมดตัวอย่าง) */
+const PREVIEW_ROWS = [{"row": 2, "company": "ADC Corporation", "country": "Japan", "website": "http://www.adcmt.com", "tel": "TEL +81-48-651-4433", "servicePic": "Atsushi Yamada , Kazuaki Tanaka", "serviceEmail": "atsushi.yamada@adcmt.com ;  kazuaki.tanaka@adcmt.com", "salesPic": "Kazuaki Tanaka", "salesEmail": "kazuaki.tanaka@adcmt.com", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 3, "company": "AIKOH ENGINEERING Co,.Ltd", "country": "Japan", "website": "http://www.aikoh.co.jp/en", "tel": "", "servicePic": "Mr.Katsuhiro Mouri", "serviceEmail": "mouri@aikoh.co.jp", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 4, "company": "COSMOPIA HIGHTECH CORP.", "country": "Japan", "website": "https://www.cosmopia.co.jp/en/company/", "tel": "Tel:+81-54-398-5310 Fax:+81-54-398-5319", "servicePic": "Akinori Okamura", "serviceEmail": "akinori.okamura@jci-hitachi.com", "salesPic": "Toshiyuki Ogawa", "salesEmail": "t-ogawa@cosmopia.co.jp", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 5, "company": "ESPEC ENGINEERING (THAILAND) CO.,LTD.", "country": "Thai", "website": "http://www.espec.co.th/en/", "tel": "Tel : 038-109353", "servicePic": "Mr.Suttisak Khongsib ( Chai )", "serviceEmail": "k-suttisak@espec.co.th", "salesPic": "", "salesEmail": "", "techWeb": "https://www.espec.co.jp/english/support/daily_check/", "priceLink": "https://www.iwatsu.co.jp/tme/sc/sc7205a/sc7205a_price/", "logo": ""}, {"row": 6, "company": "IWATSU ELECTRIC CO., LTD.", "country": "Japan", "website": "https://www.iwatsu.com/tme/sc/", "tel": "TEL: +81-3-5370-5483", "servicePic": "YOSHIZAWA, Hiroshi, Mr.", "serviceEmail": "h.yoshizawa@graphteciwatsu.co.jp", "salesPic": "YOSHIZAWA, Hiroshi, Mr.", "salesEmail": "yosizawa@iwatsu.co.jp", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 7, "company": "J.SRI RUNG RUENG IMPEX CO., LTD.", "country": "Thai", "website": "https://jsr.co.th/", "tel": "Tel.02-327-0351-5,734-4588,081-4145551", "servicePic": "Khun kanokwan", "serviceEmail": "salesjsr@jsr.co.th, nopporn@jsr.co.th, annop@jsr.co.th", "salesPic": "Khun kanokwan", "salesEmail": "salesjsr@jsr.co.th, nopporn@jsr.co.th, annop@jsr.co.th", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 8, "company": "KIKUSUI ELECTRONICS CORP.", "country": "Japan", "website": "https://global.kikusui.co.jp/", "tel": "TEL:+81-(45)482-6353", "servicePic": "Mr.Kenta Inaba", "serviceEmail": "k-inaba@kikusui.co.jp , service@kikusui.co.jp , k-otsuka@kikusui.co.jp ,s-ikegami@kikusui.co.jp, section2@kikusui.co.jp,t-gaikwad@kikusui.co.jp", "salesPic": "Mr.Kenta Otsuka / Ms.Trupti Gaikwad", "salesEmail": "k-otsuka@kikusui.co.jp ,s-ikegami@kikusui.co.jp, section2@kikusui.co.jp,t-gaikwad@kikusui.co.jp", "techWeb": "https://kikusui.co.jp/discon/", "priceLink": "", "logo": ""}, {"row": 9, "company": "NEXT", "country": "Japan", "website": "http://www.nextcorp.co.jp", "tel": "TEL：047-405-4055　FAX：047-405-4056", "servicePic": "Mr.Matsumoto", "serviceEmail": "matsumoto@nextcorp.co.jp", "salesPic": "Mr.Matsumoto", "salesEmail": "matsumoto@nextcorp.co.jp", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 10, "company": "NF Techno Commerce Co., Ltd.", "country": "Japan", "website": "https://www.nfcorp.co.jp/english/", "tel": "(Phone) +81-45-545-8128", "servicePic": "Mr.Joonhyuk Park", "serviceEmail": "park-j@nf-techno.co.jp", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 11, "company": "OnoSokki (Thailand) Co.,Ltd.", "country": "Thai", "website": "https://www.onosokki.co.th/", "tel": "tel: +66-2584-6735-9", "servicePic": "Mr. Wiriya  Tonprasongrat", "serviceEmail": "wiriya@onosokki.co.th", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 12, "company": "RION CO., LTD.    (Particle )", "country": "Japan", "website": "https://particle.rion.co.jp/english/membership/", "tel": "", "servicePic": "Bruce NDS", "serviceEmail": "bruce@n-denkei.com", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 13, "company": "RION CO., LTD.    ( Sound ,Vibration )", "country": "Japan", "website": "Product Information| RION CO.,LTD Sound Level Meters", "tel": "", "servicePic": "Rika Minagaki , Pongsun", "serviceEmail": "minagaki.rika@rion.co.jp ; Pongsun.Jhangthong@rion.co.jp", "salesPic": "Rika Minagaki , Pongsun", "salesEmail": "minagaki.rika@rion.co.jp ; Pongsun.Jhangthong@rion.co.jp", "techWeb": "https://rion-sv.com/service/non-supported.html", "priceLink": "", "logo": ""}, {"row": 14, "company": "Suga Test Instruments Co.,Ltd.", "country": "Japan", "website": "https://www.sugatest.co.jp/en/contactus/", "tel": "Repair", "servicePic": "Mr.Takashi MINAMI", "serviceEmail": "minami@sugatest.co.jp ; t_ishida@suga-global.com ; k_sakamoto@sugatest.co.jp", "salesPic": "Mr.Takashi Minami", "salesEmail": "minami@sugatest.co.jp ; t_ishida@suga-global.com ; yoshino@sugatest.co.jp ; ma_saito@sugatest.co.jp", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 15, "company": "Suga Test Instruments Co.,Ltd.", "country": "Japan", "website": "https://www.sugatest.co.jp/en/contactus/", "tel": "Spare part", "servicePic": "Mr.Kazushige SAKAMOTO", "serviceEmail": "k_sakamoto@sugatest.co.jp ; minami@sugatest.co.jp ; t_ishida@suga-global.com ; ma_saito@sugatest.co.jp ; kazama@sugatest.co.jp", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 16, "company": "Suga Test Instruments Co.,Ltd.", "country": "Japan", "website": "https://www.sugatest.co.jp/en/contactus/", "tel": "Calibration", "servicePic": "Ms.mari miura", "serviceEmail": "m_miura@sugatest.co.jp", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 17, "company": "Takasago", "country": "Japan", "website": "https://www.takasago-ss.co.jp/customer/foreign.html", "tel": "", "servicePic": "Mr.Akiyama, Masayoshi", "serviceEmail": "masayoshi.akiyama@takasagoseisakusho.com", "salesPic": "Mr.Akiyama, Masayoshi", "salesEmail": "masayoshi.akiyama@takasagoseisakusho.com", "techWeb": "https://www.takasago-ss.co.jp/customer/foreign.html", "priceLink": "", "logo": ""}, {"row": 18, "company": "TechnoOptis Co.,Ltd.", "country": "Japan", "website": "https://www.techno-optis.com/en/support/", "tel": "TEL：+81-3-3558-2666  , Mobile : +81 90 7047 5448", "servicePic": "Masahito Abe", "serviceEmail": "mabe@techno-optis.com", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}, {"row": 19, "company": "Techno Science Japan  (TSJ)", "country": "Japan", "website": "https://tsjcorp.co.jp/en/home-en/", "tel": "", "servicePic": "Contact to NDI", "serviceEmail": "", "salesPic": "", "salesEmail": "", "techWeb": "", "priceLink": "", "logo": ""}];
+
+(function () {
+  'use strict';
+  const FIELDS = ['company','country','website','tel','servicePic','serviceEmail','salesPic','salesEmail','techWeb','priceLink'];
+  const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+  const $ = (s, r) => (r || document).querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // ---------- backend ----------
+  const mock = (() => {
+    let rows = PREVIEW_ROWS.map(r => Object.assign({}, r));
+    const wait = v => new Promise(res => setTimeout(() => res(JSON.parse(JSON.stringify(v))), 250));
+    const setGroupLogo = (company, val) => { const k = groupKey(company); rows.forEach(r => { if (groupKey(r.company) === k) r.logo = val; }); };
+    return {
+      getData: () => wait({ rows }),
+      saveContact: d => {
+        if (!String(d.company || '').trim()) return Promise.reject(new Error('กรุณากรอกชื่อบริษัท (Company)'));
+        const clean = {}; FIELDS.forEach(f => clean[f] = String(d[f] || '').trim());
+        if (d.row) Object.assign(rows.find(r => r.row === d.row), clean);
+        else {
+          const k = groupKey(clean.company);
+          const ex = rows.find(r => groupKey(r.company) === k && r.logo);
+          rows.push(Object.assign({ row: Math.max(1, ...rows.map(r => r.row)) + 1, logo: ex ? ex.logo : '' }, clean));
+        }
+        if (d.logo && d.logo.dataUrl) setGroupLogo(clean.company, d.logo.dataUrl);
+        else if (d.logoUrl) setGroupLogo(clean.company, d.logoUrl);
+        return wait({ rows });
+      },
+      getLogoData: url => Promise.reject(new Error('รูปนี้เป็นลิงก์ภายนอก — อัปโหลดไฟล์ใหม่แทน (ระบบจะตัดขอบให้อัตโนมัติ)')),
+      setLogo: (company, logo) => { setGroupLogo(company, logo ? (logo.dataUrl || logo.url || '') : ''); return wait({ rows }); },
+      deleteContact: (row) => { rows = rows.filter(r => r.row !== row).map(r => r.row > row ? Object.assign(r, { row: r.row - 1 }) : r); return wait({ rows }); }
+    };
+  })();
+  function api(fn, ...args) {
+    if (!HAS_GAS) return mock[fn](...args);
+    return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+  }
+
+  // ---------- helpers ----------
+  function groupKey(name) { return String(name || '').replace(/\([^)]*\)\s*$/, ' ').toLowerCase().replace(/[^a-z0-9฀-๿]+/g, ''); }
+  function baseName(name) { return String(name || '').replace(/\([^)]*\)\s*$/, '').replace(/\s+/g, ' ').trim(); }
+  function trailingParen(name) { const m = /\(([^)]*)\)\s*$/.exec(String(name || '')); return m ? m[1].replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ').trim() : ''; }
+  function clean(s) { return String(s || '').replace(/\s+/g, ' ').trim(); }
+  function isUrl(s) { return /^https?:\/\/\S+$/i.test(String(s || '').trim()); }
+  function domainOf(s) { try { return new URL(String(s).trim()).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
+  function splitEmails(s) { return String(s || '').split(/[;,\s]+/).map(x => x.trim()).filter(x => /@/.test(x)); }
+  function countryCode(c) {
+    const t = clean(c).toLowerCase();
+    if (!t) return '—';
+    if (t.startsWith('jap')) return 'JP';
+    if (t.startsWith('thai')) return 'TH';
+    if (t === 'ไม่ระบุ') return '—';
+    const map = { germany: 'DE', usa: 'US', 'united states': 'US', china: 'CN', korea: 'KR', taiwan: 'TW', singapore: 'SG', uk: 'UK', 'united kingdom': 'UK', france: 'FR', italy: 'IT', switzerland: 'CH', malaysia: 'MY' };
+    return map[t] || t.slice(0, 2).toUpperCase();
+  }
+  function countryName(c) { const t = clean(c); if (!t) return 'ไม่ระบุ'; return /^thai/i.test(t) ? 'Thailand' : t.charAt(0).toUpperCase() + t.slice(1); }
+  // ช่อง Country ใส่ได้หลายประเทศ คั่นด้วย , / ; หรือ & เช่น "Japan, Thai"
+  function parseCountries(v) { return String(v || '').split(/\s*(?:[,\/;&|]|\sand\s)\s*/i).map(clean).filter(Boolean); }
+  function countryNames(v) { const out = []; parseCountries(v).forEach(c => { const n = countryName(c); if (!out.includes(n)) out.push(n); }); return out.length ? out : ['ไม่ระบุ']; }
+  function countryMeta(names) { return names.map(n => '<span class="cc">' + esc(countryCode(n)) + '</span>').join('') + '<span>' + esc(names.join(' · ')) + '</span>'; }
+  // ชื่อที่ใช้เขียนลงชีต — คงรูปแบบเดิมของชีต (Thailand → Thai)
+  const SHEET_NAME = n => n === 'Thailand' ? 'Thai' : n;
+  function initials(name) {
+    const words = baseName(name).replace(/[^A-Za-z0-9\u0E00-\u0E7F]+/g, ' ').split(/\s+/).filter(w => w && !/^(co|ltd|corp|inc|the|engineering|electric|electronics)$/i.test(w));
+    if (!words.length) return '?';
+    if (/^[A-Z0-9]{2,4}$/.test(words[0])) return words[0];
+    return (words[0][0] + (words[1] ? words[1][0] : (words[0][1] || ''))).toUpperCase();
+  }
+  function hueVar(key) { let h = 0; for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return 'var(--m' + (h % 5 + 1) + ')'; }
+  function driveId(url) { const m = /[?&]id=([\w-]{20,})/.exec(url) || /\/d\/([\w-]{20,})/.exec(url); return m ? m[1] : ''; }
+  function logoHTML(g) {
+    const mono = '<div class="mono" style="background:' + hueVar(g.key) + '">' + esc(initials(g.name)) + '</div>';
+    if (!g.logo) return mono;
+    const id = /^https?:/.test(g.logo) ? driveId(g.logo) : '';
+    const src = id ? 'https://lh3.googleusercontent.com/d/' + id + '=w600' : g.logo;
+    const alt = id ? 'https://drive.google.com/thumbnail?id=' + id + '&sz=w600' : '';
+    return '<img alt="โลโก้ ' + esc(g.name) + '" loading="lazy" src="' + esc(src) + '" data-alt="' + esc(alt) + '" data-mono="' + esc(mono) + '">';
+  }
+  document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && t.dataset.mono) logoFail(t); }, true);
+  function logoFail(img) {
+    if (img.dataset.alt && !img.dataset.retried) { img.dataset.retried = '1'; img.src = img.dataset.alt; return; }
+    img.outerHTML = img.dataset.mono;
+  }
+  const ICON = {
+    copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>',
+    check: '<svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>',
+    ext: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+  };
+
+  // ---------- state ----------
+  const state = { rows: [], groups: [], q: '', country: 'ALL', openKey: null, editRow: null, pendingLogo: null };
+
+  function buildGroups(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+      const k = groupKey(r.company) || ('row' + r.row);
+      if (!map.has(k)) map.set(k, { key: k, rows: [] });
+      map.get(k).rows.push(r);
+    });
+    return [...map.values()].map(g => {
+      const multi = g.rows.length > 1;
+      g.name = multi ? baseName(g.rows[0].company) : clean(g.rows[0].company);
+      g.logo = (g.rows.find(r => r.logo) || {}).logo || '';
+      g.countries = [];
+      g.rows.forEach(r => parseCountries(r.country).forEach(c => { const n = countryName(c); if (!g.countries.includes(n)) g.countries.push(n); }));
+      if (!g.countries.length) g.countries = ['ไม่ระบุ'];
+      g.country = g.countries.map(SHEET_NAME).join(', ');
+      g.website = (g.rows.find(r => isUrl(r.website)) || g.rows[0]).website || '';
+      g.rows.forEach((r, i) => {
+        const p = trailingParen(r.company);
+        const telIsLabel = r.tel && !/\d/.test(r.tel);
+        r._label = multi ? (p || (telIsLabel ? clean(r.tel) : 'ผู้ติดต่อ ' + (i + 1))) : (telIsLabel ? clean(r.tel) : '');
+        r._tel = telIsLabel ? '' : clean(r.tel);
+      });
+      g.search = [g.name, g.country, g.countries.join(' '), ...g.rows.flatMap(r => [r.company, r.servicePic, r.serviceEmail, r.salesPic, r.salesEmail, r._label, r.tel, r.website])].join(' ').toLowerCase();
+      return g;
+    }).sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+  }
+
+  function setData(res) {
+    state.rows = (res && res.rows) || [];
+    state.groups = buildGroups(state.rows);
+    $('#statMakers').textContent = state.groups.length;
+    $('#statContacts').textContent = state.rows.length;
+    $('#statLogos').textContent = state.groups.filter(g => g.logo).length;
+    const countries = allCountries();
+    $('#countryList').innerHTML = countries.filter(c => c !== 'ไม่ระบุ').map(c => '<option value="' + esc(c) + '">').join('');
+    $('#companyList').innerHTML = state.groups.map(g => '<option value="' + esc(g.name) + '">').join('');
+    renderChips(countries);
+    renderGrid();
+    if (state.openKey) { const g = state.groups.find(x => x.key === state.openKey); if (g && $('#detailDlg').open) renderDetail(g); else if (!g) closeDlg($('#detailDlg')); }
+  }
+
+  function allCountries() { return [...new Set(state.groups.flatMap(g => g.countries))].sort((a, b) => (a === 'ไม่ระบุ') - (b === 'ไม่ระบุ') || a.localeCompare(b)); }
+  function renderChips(countries) {
+    if (state.country !== 'ALL' && !countries.includes(state.country)) state.country = 'ALL';
+    const items = [['ALL', 'ทั้งหมด', state.groups.length]].concat(countries.map(c => [c, c, state.groups.filter(g => g.countries.includes(c)).length]));
+    $('#chips').innerHTML = items.map(([v, label, n]) =>
+      '<button class="chip" type="button" data-country="' + esc(v) + '" aria-pressed="' + (state.country === v) + '">' +
+      (v === 'ALL' ? '' : '<span class="cc">' + esc(countryCode(v)) + '</span>') + esc(label) + ' <span class="n">' + n + '</span></button>').join('');
+  }
+
+  function filtered() {
+    const words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    return state.groups.filter(g => (state.country === 'ALL' || g.countries.includes(state.country)) && words.every(w => g.search.includes(w)));
+  }
+
+  function renderGrid() {
+    const list = filtered();
+    $('#resultline').textContent = list.length === state.groups.length ? 'แสดงทั้งหมด ' + list.length + ' Makers' : 'พบ ' + list.length + ' จาก ' + state.groups.length + ' Makers';
+    if (!list.length) {
+      $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><div>ไม่พบ Maker ที่ตรงกับ “' + esc(state.q) + '”</div><button class="btn accent" type="button" id="emptyAdd">เพิ่ม Maker ใหม่</button></div>';
+      $('#emptyAdd').onclick = () => openForm({ company: state.q });
+      return;
+    }
+    $('#grid').innerHTML = list.map(g => {
+      const n = g.rows.length;
+      const dom = isUrl(g.website) ? domainOf(g.website) : '';
+      return '<button class="card" type="button" data-key="' + esc(g.key) + '">' +
+        '<div class="plate">' + logoHTML(g) + (g.logo ? '' : '<span class="add-logo">+ โลโก้</span>') + '</div>' +
+        '<div class="card-body"><div class="card-name">' + esc(g.name) + '</div>' +
+        '<div class="meta">' + countryMeta(g.countries) + '<span class="dot"></span><span>' + n + ' ผู้ติดต่อ</span></div>' +
+        (dom ? '<div class="meta"><span class="domain">' + esc(dom) + '</span></div>' : '') +
+        '</div></button>';
+    }).join('');
+  }
+
+  // ---------- detail ----------
+  function personHTML(role, name, emails) {
+    const list = splitEmails(emails);
+    if (!clean(name) && !list.length) return '<div class="person"><div class="role">' + role + '</div><div class="none">ไม่มีข้อมูล</div></div>';
+    return '<div class="person"><div class="role">' + role + '</div>' +
+      (clean(name) ? '<div class="pname">' + esc(clean(name)) + '</div>' : '') +
+      (list.length ? '<div class="emails">' + list.map(e => '<div class="email"><a href="mailto:' + esc(e) + '">' + esc(e) + '</a><button class="copy" type="button" data-copy="' + esc(e) + '" aria-label="คัดลอก ' + esc(e) + '">' + ICON.copy + '</button></div>').join('') + '</div>' : '') +
+      '</div>';
+  }
+
+  function renderDetail(g) {
+    $('#dPlate').innerHTML = logoHTML(g);
+    $('#dTitle').textContent = g.name;
+    $('#dMeta').innerHTML = countryMeta(g.countries) + '<span class="dot"></span><span>' + g.rows.length + ' ผู้ติดต่อ</span>';
+    $('#dLogoBtn span').textContent = g.logo ? 'เปลี่ยนโลโก้' : 'อัปโหลดโลโก้';
+    $('#dLogoDel').hidden = !g.logo;
+    $('#dLogoTrim').hidden = !g.logo;
+    $('#dLogoUrlRow').hidden = true;
+
+    const links = []; const seen = new Set();
+    const addLink = (label, url) => { if (isUrl(url) && !seen.has(url.trim())) { seen.add(url.trim()); links.push('<a class="btn sm" href="' + esc(url.trim()) + '" target="_blank" rel="noopener">' + ICON.ext + esc(label) + '</a>'); } };
+    g.rows.forEach(r => addLink('เว็บไซต์' + (g.rows.length > 1 && links.length ? ' (' + r._label + ')' : ''), r.website));
+    g.rows.forEach(r => addLink('Technical website', r.techWeb));
+    g.rows.forEach(r => addLink('ราคาเครื่องใหม่', r.priceLink));
+    g.rows.forEach(r => { if (clean(r.website) && !isUrl(r.website)) links.push('<span class="btn sm" style="cursor:default">' + esc(clean(r.website)) + '</span>'); });
+    $('#dLinks').innerHTML = links.join('') || '<span class="none">ยังไม่มีลิงก์เว็บไซต์</span>';
+    $('#dLinks').hidden = false;
+
+    $('#dContacts').innerHTML = g.rows.map(r =>
+      '<section class="contact" data-row="' + r.row + '">' +
+      '<div class="contact-head"><div class="contact-label">' + esc(r._label || 'ข้อมูลติดต่อ') + '<small>แถว ' + r.row + '</small></div>' +
+      '<div class="acts"><button class="btn sm" type="button" data-edit="' + r.row + '">แก้ไข</button><button class="btn sm danger" type="button" data-del="' + r.row + '">ลบ</button></div></div>' +
+      (r._tel ? '<div class="tel"><span>' + esc(r._tel) + '</span><button class="copy" type="button" data-copy="' + esc(r._tel) + '" aria-label="คัดลอกเบอร์โทร">' + ICON.copy + '</button></div>' : '') +
+      '<div class="people">' + personHTML('Service', r.servicePic, r.serviceEmail) + personHTML('Sales', r.salesPic, r.salesEmail) + '</div>' +
+      '</section>').join('');
+  }
+
+  function openDetail(key) {
+    const g = state.groups.find(x => x.key === key); if (!g) return;
+    state.openKey = key; renderDetail(g); openDlg($('#detailDlg'));
+  }
+
+  // ---------- country picker ----------
+  function setCountryPicker(value) {
+    const chosen = countryNames(value).filter(n => n !== 'ไม่ระบุ');
+    const opts = [...new Set(['Japan', 'Thailand', ...allCountries().filter(c => c !== 'ไม่ระบุ')])];
+    $('#cPick').innerHTML = opts.map(n => '<button type="button" data-c="' + esc(n) + '" aria-pressed="' + chosen.includes(n) + '"><span class="box"></span><span class="cc">' + esc(countryCode(n)) + '</span>' + esc(n) + '</button>').join('');
+    $('#f_countryOther').value = chosen.filter(n => !opts.includes(n)).join(', ');
+    syncCountry();
+  }
+  function syncCountry() {
+    const picked = [...document.querySelectorAll('#cPick [aria-pressed="true"]')].map(b => b.dataset.c);
+    countryNames($('#f_countryOther').value).filter(n => n !== 'ไม่ระบุ' && !picked.includes(n)).forEach(n => picked.push(n));
+    $('#f_country').value = picked.map(SHEET_NAME).join(', ');
+  }
+  $('#cPick').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true'); syncCountry(); });
+  $('#f_countryOther').addEventListener('input', syncCountry);
+
+  // ---------- form ----------
+  function openForm(row, opts) {
+    opts = opts || {};
+    state.editRow = row && row.row ? row.row : null;
+    state.pendingLogo = null;
+    $('#fTitle').textContent = state.editRow ? 'แก้ไขข้อมูลติดต่อ' : (opts.addToGroup ? 'เพิ่มผู้ติดต่อ / แผนก' : 'เพิ่ม Maker');
+    FIELDS.forEach(f => { $('#f_' + f).value = row ? clean(row[f]) : ''; });
+    setCountryPicker(row ? row.country : '');
+    if (row && row.serviceEmail) $('#f_serviceEmail').value = splitEmails(row.serviceEmail).join('; ');
+    if (row && row.salesEmail) $('#f_salesEmail').value = splitEmails(row.salesEmail).join('; ');
+    const g = row && row.company ? state.groups.find(x => x.key === groupKey(row.company)) : null;
+    $('#fPlate').innerHTML = g && g.logo ? logoHTML(g) : '<span class="ph">ยังไม่มีโลโก้</span>';
+    $('#fErr').hidden = true;
+    $('#fSave').disabled = false; $('#fSave').textContent = 'บันทึก';
+    openDlg($('#formDlg'));
+    setTimeout(() => (opts.addToGroup ? $('#f_tel') : $('#f_company')).focus(), 50);
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    syncCountry();
+    const data = {}; FIELDS.forEach(f => data[f] = $('#f_' + f).value.trim());
+    if (!data.company) { showErr('กรุณากรอกชื่อบริษัท'); $('#f_company').focus(); return; }
+    for (const f of ['website', 'techWeb', 'priceLink']) if (data[f] && !/^https?:\/\//i.test(data[f])) data[f] = 'https://' + data[f];
+    if (state.editRow) data.row = state.editRow;
+    if (state.pendingLogo) data.logo = { dataUrl: state.pendingLogo.dataUrl, name: state.pendingLogo.name || 'logo.png' };
+    $('#fSave').disabled = true; $('#fSave').textContent = 'กำลังบันทึก…';
+    try {
+      const res = await api('saveContact', data);
+      const isNew = !state.editRow;
+      setData(res);
+      closeDlg($('#formDlg'));
+      toast(isNew ? 'เพิ่ม “' + baseName(data.company) + '” แล้ว' : 'บันทึกการแก้ไขแล้ว');
+      if (isNew && !$('#detailDlg').open) { state.q = ''; $('#q').value = ''; renderGrid(); }
+      const k = groupKey(data.company);
+      if ($('#detailDlg').open && state.openKey !== k) { state.openKey = k; renderDetail(state.groups.find(x => x.key === k)); }
+    } catch (err) {
+      showErr(msgOf(err));
+      $('#fSave').disabled = false; $('#fSave').textContent = 'บันทึก';
+    }
+  }
+  function showErr(m) { $('#fErr').textContent = m; $('#fErr').hidden = false; }
+  function msgOf(err) { return (err && (err.message || err)) ? String(err.message || err).replace(/^Exception:\s*/, '') : 'เกิดข้อผิดพลาด'; }
+
+  // ---------- image handling ----------
+  // ---------- image handling ----------
+  function readFile(file) {
+    return new Promise((resolve, reject) => {
+      if (!file || !/^image\//.test(file.type)) return reject(new Error('กรุณาเลือกไฟล์รูปภาพ'));
+      if (file.size > 10 * 1024 * 1024) return reject(new Error('ไฟล์ใหญ่เกิน 10 MB'));
+      const fr = new FileReader();
+      fr.onerror = () => reject(new Error('อ่านไฟล์ไม่สำเร็จ'));
+      fr.onload = () => resolve(fr.result);
+      fr.readAsDataURL(file);
+    });
+  }
+  function loadCanvas(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('เปิดไฟล์รูปนี้ไม่ได้'));
+      img.onload = () => {
+        let w = img.naturalWidth || 600, h = img.naturalHeight || 300;
+        const k = Math.min(1, 1600 / Math.max(w, h)); w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c);
+      };
+      img.src = dataUrl;
+    });
+  }
+  // ตัดพื้นขาว/โปร่งใสรอบโลโก้ออก เหลือขอบ 2%
+  function trimCanvas(c) {
+    const w = c.width, h = c.height, d = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h).data;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4, a = d[i + 3];
+      if (!(a < 16 || (d[i] > 238 && d[i + 1] > 238 && d[i + 2] > 238))) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0) return c;
+    const m = Math.round(Math.max(x1 - x0, y1 - y0) * 0.02);
+    x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m);
+    const out = document.createElement('canvas'); out.width = x1 - x0 + 1; out.height = y1 - y0 + 1;
+    out.getContext('2d').drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+    return out;
+  }
+
+  // ---------- logo editor (ปรับขนาด / ครอบ) ----------
+  const ED = { W: 800, H: 450, orig: null, trimmed: null, useTrim: true, scale: 1, ox: 0, oy: 0, done: null };
+  const edSrc = () => ED.useTrim ? ED.trimmed : ED.orig;
+  const fitScale = () => { const s = edSrc(); return Math.min(ED.W * 0.9 / s.width, ED.H * 0.9 / s.height); };
+  const coverScale = () => { const s = edSrc(); return Math.max(ED.W / s.width, ED.H / s.height); };
+  function edPaint(ctx, w, h, guides) {
+    const src = edSrc(), k = w / ED.W;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); // พื้นขาวทึบ — Drive แสดงส่วนโปร่งใสเป็นสีดำ
+    ctx.imageSmoothingQuality = 'high';
+    const dw = src.width * ED.scale * k, dh = src.height * ED.scale * k;
+    ctx.drawImage(src, (w - dw) / 2 + ED.ox * k, (h - dh) / 2 + ED.oy * k, dw, dh);
+  }
+  function edRender() {
+    const c = $('#cCanvas'); edPaint(c.getContext('2d'), c.width, c.height, true);
+    const pct = Math.round(ED.scale / fitScale() * 100);
+    $('#cZoom').value = Math.max(10, Math.min(400, pct)); $('#cZoomOut2').textContent = pct + '%';
+    $('#cFit').setAttribute('aria-pressed', Math.abs(ED.scale - fitScale()) < 1e-6 && !ED.ox && !ED.oy);
+    $('#cCover').setAttribute('aria-pressed', Math.abs(ED.scale - coverScale()) < 1e-6 && !ED.ox && !ED.oy);
+    $('#cTrimOn').setAttribute('aria-pressed', ED.useTrim); $('#cTrimOff').setAttribute('aria-pressed', !ED.useTrim);
+    clearTimeout(ED.pt); ED.pt = setTimeout(() => { $('#cPreview').innerHTML = '<img alt="" src="' + edExport() + '">'; }, 120);
+  }
+  function edExport() {
+    const out = document.createElement('canvas'); out.width = ED.W; out.height = ED.H;
+    edPaint(out.getContext('2d'), out.width, out.height, false);
+    return out.toDataURL('image/png');
+  }
+  function edZoom(newScale) { const k = newScale / ED.scale; ED.scale = newScale; ED.ox *= k; ED.oy *= k; edRender(); }
+  async function openEditor(dataUrl) {
+    ED.orig = await loadCanvas(dataUrl);
+    ED.trimmed = trimCanvas(ED.orig);
+    ED.useTrim = true; ED.ox = 0; ED.oy = 0; ED.scale = fitScale();
+    openDlg($('#cropDlg')); edRender();
+    return new Promise(resolve => { ED.done = resolve; });
+  }
+  function closeEditor(result) { const done = ED.done; ED.done = null; closeDlg($('#cropDlg')); if (done) done(result); }
+  $('#cOk').addEventListener('click', () => closeEditor({ dataUrl: edExport(), name: 'logo.png' }));
+  $('#cCancel').addEventListener('click', () => closeEditor(null));
+  $('#cClose').addEventListener('click', () => closeEditor(null));
+  $('#cropDlg').addEventListener('cancel', e => { e.preventDefault(); closeEditor(null); });
+  $('#cZoom').addEventListener('input', e => edZoom(fitScale() * e.target.value / 100));
+  $('#cZoomIn').addEventListener('click', () => edZoom(ED.scale * 1.1));
+  $('#cZoomOut').addEventListener('click', () => edZoom(ED.scale / 1.1));
+  $('#cFit').addEventListener('click', () => { ED.scale = fitScale(); ED.ox = ED.oy = 0; edRender(); });
+  $('#cCover').addEventListener('click', () => { ED.scale = coverScale(); ED.ox = ED.oy = 0; edRender(); });
+  $('#cCenter').addEventListener('click', () => { ED.ox = ED.oy = 0; edRender(); });
+  $('#cTrimOn').addEventListener('click', () => { if (!ED.useTrim) { ED.useTrim = true; ED.scale = fitScale(); ED.ox = ED.oy = 0; edRender(); } });
+  $('#cTrimOff').addEventListener('click', () => { if (ED.useTrim) { ED.useTrim = false; ED.scale = fitScale(); ED.ox = ED.oy = 0; edRender(); } });
+  (function () {
+    const st = $('#stage'), pts = new Map(); let last = null, pinch = null;
+    const toCanvas = () => ED.W / st.getBoundingClientRect().width;
+    st.addEventListener('pointerdown', e => { st.setPointerCapture(e.pointerId); pts.set(e.pointerId, e); st.classList.add('dragging'); last = { x: e.clientX, y: e.clientY }; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), s: ED.scale }; } });
+    st.addEventListener('pointermove', e => {
+      if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, e);
+      if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); edZoom(Math.max(fitScale() * .1, Math.min(fitScale() * 4, pinch.s * d / pinch.d))); return; }
+      const k = toCanvas(); ED.ox += (e.clientX - last.x) * k; ED.oy += (e.clientY - last.y) * k; last = { x: e.clientX, y: e.clientY }; edRender();
+    });
+    const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) st.classList.remove('dragging'); else last = { x: [...pts.values()][0].clientX, y: [...pts.values()][0].clientY }; };
+    st.addEventListener('pointerup', up); st.addEventListener('pointercancel', up);
+    st.addEventListener('wheel', e => { e.preventDefault(); edZoom(Math.max(fitScale() * .1, Math.min(fitScale() * 4, ED.scale * (e.deltaY < 0 ? 1.08 : 1 / 1.08)))); }, { passive: false });
+    st.addEventListener('keydown', e => { const m = { ArrowLeft: [-5, 0], ArrowRight: [5, 0], ArrowUp: [0, -5], ArrowDown: [0, 5] }[e.key]; if (m) { e.preventDefault(); ED.ox += m[0]; ED.oy += m[1]; edRender(); } });
+    st.tabIndex = 0;
+  })();
+  async function editLogoFile(file) { return openEditor(await readFile(file)); }
+
+  async function pickFormLogo(file) {
+    try {
+      const src = await readFile(file);
+      const logo = await openEditor(src);
+      if (!logo) return;
+      logo.src = src;
+      state.pendingLogo = logo;
+      $('#fPlate').innerHTML = '<img alt="ตัวอย่างโลโก้" src="' + logo.dataUrl + '">';
+    } catch (err) { showErr(msgOf(err)); }
+  }
+  async function saveGroupLogo(logo, okMsg) {
+    const g = state.groups.find(x => x.key === state.openKey); if (!g) return;
+    const btn = $('#dLogoBtn'); btn.disabled = true; $('#dLogoBtn span').textContent = 'กำลังบันทึก…';
+    try { setData(await api('setLogo', g.rows[0].company, logo)); toast(okMsg); }
+    catch (err) { toast(msgOf(err), true); renderDetail(g); }
+    finally { btn.disabled = false; }
+  }
+
+  // ---------- ui utils ----------
+  function openDlg(d) { if (!d.open) d.showModal(); }
+  function closeDlg(d) { if (d.open) d.close(); }
+  let tt;
+  function toast(m, bad) { const t = $('#toast'); t.textContent = m; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2600); }
+  async function copyText(text, btn) {
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) { const r = document.createRange(); const el = btn.previousElementSibling; if (el) { r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } toast('เลือกข้อความแล้ว กด Ctrl+C เพื่อคัดลอก'); return; }
+    btn.classList.add('ok'); btn.innerHTML = ICON.check; toast('คัดลอกแล้ว: ' + text);
+    setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = ICON.copy; }, 1500);
+  }
+
+  // ---------- events ----------
+  $('#q').addEventListener('input', e => { state.q = e.target.value; renderGrid(); });
+  $('#chips').addEventListener('click', e => { const b = e.target.closest('[data-country]'); if (!b) return; state.country = b.dataset.country; renderChips(allCountries()); renderGrid(); });
+  $('#grid').addEventListener('click', e => { const c = e.target.closest('.card'); if (c) openDetail(c.dataset.key); });
+  $('#addBtn').addEventListener('click', () => openForm(null));
+  document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeDlg(b.closest('dialog'))));
+  document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) closeDlg(d); }));
+  $('#detailDlg').addEventListener('close', () => { state.openKey = null; });
+  $('#form').addEventListener('submit', onSubmit);
+
+  $('#dContacts').addEventListener('click', async e => {
+    const cp = e.target.closest('[data-copy]'); if (cp) return copyText(cp.dataset.copy, cp);
+    const ed = e.target.closest('[data-edit]');
+    if (ed) return openForm(state.rows.find(r => r.row === Number(ed.dataset.edit)));
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      const sec = del.closest('.contact');
+      if (sec.querySelector('.confirm')) return;
+      const row = state.rows.find(r => r.row === Number(del.dataset.del));
+      const box = document.createElement('div'); box.className = 'confirm';
+      box.innerHTML = '<span>ลบแถว ' + row.row + ' ออกจากชีต? กู้คืนได้จากประวัติเวอร์ชันของชีตเท่านั้น</span><span style="margin-left:auto;display:flex;gap:6px"><button class="btn sm" type="button" data-cancel>ยกเลิก</button><button class="btn sm primary" type="button" data-yes>ลบเลย</button></span>';
+      sec.appendChild(box);
+      box.querySelector('[data-cancel]').onclick = () => box.remove();
+      box.querySelector('[data-yes]').onclick = async ev => {
+        ev.target.disabled = true; ev.target.textContent = 'กำลังลบ…';
+        try { setData(await api('deleteContact', row.row, row.company)); toast('ลบแล้ว'); }
+        catch (err) { toast(msgOf(err), true); box.remove(); }
+      };
+    }
+  });
+  $('#dLinks').addEventListener('click', e => { const cp = e.target.closest('[data-copy]'); if (cp) copyText(cp.dataset.copy, cp); });
+  $('#dAddContact').addEventListener('click', () => {
+    const g = state.groups.find(x => x.key === state.openKey); if (!g) return;
+    openForm({ company: g.rows[0].company, country: g.country, website: g.website }, { addToGroup: true });
+  });
+  $('#dLogoBtn').addEventListener('click', () => $('#dLogoFile').click());
+  $('#dLogoFile').addEventListener('change', async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try { const logo = await editLogoFile(f); if (!logo) return; $('#dPlate').innerHTML = '<img alt="" src="' + logo.dataUrl + '">'; await saveGroupLogo(logo, 'บันทึกโลโก้แล้ว'); }
+    catch (err) { toast(msgOf(err), true); }
+  });
+  $('#dLogoUrlBtn').addEventListener('click', () => { $('#dLogoUrlRow').hidden = !$('#dLogoUrlRow').hidden; if (!$('#dLogoUrlRow').hidden) $('#dLogoUrl').focus(); });
+  $('#dLogoUrlSave').addEventListener('click', () => {
+    const u = $('#dLogoUrl').value.trim();
+    if (!isUrl(u)) return toast('ลิงก์ต้องขึ้นต้นด้วย https://', true);
+    saveGroupLogo({ url: u }, 'บันทึกโลโก้แล้ว');
+  });
+  $('#dLogoDel').addEventListener('click', () => saveGroupLogo(null, 'เอาโลโก้ออกแล้ว'));
+  $('#dLogoTrim').addEventListener('click', async () => {
+    const g = state.groups.find(x => x.key === state.openKey); if (!g || !g.logo) return;
+    const btn = $('#dLogoTrim'); btn.disabled = true; btn.textContent = 'กำลังเปิดรูป…';
+    try {
+      const src = /^data:/.test(g.logo) ? g.logo : await api('getLogoData', g.logo);
+      btn.disabled = false; btn.textContent = 'ปรับขนาด / ครอบรูป';
+      const logo = await openEditor(src);
+      if (!logo) return;
+      $('#dPlate').innerHTML = '<img alt="" src="' + logo.dataUrl + '">';
+      await saveGroupLogo(Object.assign(logo, { name: g.name + '.png' }), 'บันทึกโลโก้แล้ว');
+    } catch (err) { toast(msgOf(err), true); }
+    finally { btn.disabled = false; btn.textContent = 'ปรับขนาด / ครอบรูป'; }
+  });
+
+  const drop = $('#drop');
+  drop.addEventListener('click', async e => {
+    if (state.pendingLogo && e.target.closest('#fPlate')) { const logo = await openEditor(state.pendingLogo.src || state.pendingLogo.dataUrl); if (logo) { logo.src = state.pendingLogo.src || state.pendingLogo.dataUrl; state.pendingLogo = logo; $('#fPlate').innerHTML = '<img alt="ตัวอย่างโลโก้" src="' + logo.dataUrl + '">'; } return; }
+    $('#fLogoFile').click();
+  });
+  drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#fLogoFile').click(); } });
+  $('#fLogoFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) pickFormLogo(f); });
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) pickFormLogo(f); });
+  $('#formDlg').addEventListener('paste', e => { const it = [...(e.clipboardData || {}).items || []].find(i => i.type.startsWith('image/')); if (it) { e.preventDefault(); pickFormLogo(it.getAsFile()); } });
+
+  // ---------- start ----------
+  $('#previewNote').hidden = !!HAS_GAS;
+  appParams(p => { if (p.q) { state.q = p.q; $('#q').value = p.q; } });
+  api('getData').then(res => { setData(res); if (state.q) { const l = filtered(); if (l.length === 1) openDetail(l[0].key); } }).catch(err => {
+    $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1"><b>โหลดข้อมูลไม่สำเร็จ</b><div>' + esc(msgOf(err)) + '</div><button class="btn" type="button" onclick="location.reload()">ลองอีกครั้ง</button></div>';
+  });
+})();
+</script>

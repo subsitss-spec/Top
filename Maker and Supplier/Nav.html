@@ -1,0 +1,32 @@
+<script>
+/* การนำทางระหว่างหน้า — ใช้ร่วมกันทุกหน้า
+   ใน Apps Script: ลิงก์เป็น URL ของเว็บแอป + ?page=... และเปิดใน _top
+   ตอนเปิดไฟล์ตัวอย่าง (ไม่มี Apps Script): ลิงก์ไปไฟล์ .html ข้าง ๆ กัน */
+(function () {
+  var HAS = typeof google !== 'undefined' && google.script && google.script.run;
+  var FILES = { home: 'index.html', makers: 'makers.html', request: 'request.html' };
+  window.navHref = function (page, params) {
+    var qs = Object.keys(params || {}).filter(function (k) { return params[k] !== '' && params[k] != null; })
+      .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+    if (HAS && window.APP_URL) return window.APP_URL + '?page=' + page + (qs ? '&' + qs : '');
+    return (FILES[page] || 'index.html') + (qs ? '?' + qs : '');
+  };
+  window.navTo = function (page, params) {
+    var href = window.navHref(page, params);
+    if (HAS) window.top.location.href = href; else location.href = href;
+  };
+  window.appParams = function (cb) {
+    if (HAS && google.script.url) { google.script.url.getLocation(function (l) { cb(l.parameter || {}); }); return; }
+    var o = {}; try { new URLSearchParams(location.search).forEach(function (v, k) { o[k] = v; }); } catch (e) {}
+    cb(o);
+  };
+  function wire() {
+    document.querySelectorAll('a[data-nav]').forEach(function (a) {
+      a.href = window.navHref(a.dataset.nav, a.dataset.q ? { q: a.dataset.q } : null);
+      if (HAS) a.target = '_top';
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
+  window.wireNav = wire;
+})();
+</script>

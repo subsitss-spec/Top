@@ -1,0 +1,736 @@
+<title>Request Check Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Tinos:wght@400;700&family=Arimo:wght@400&family=Sarabun:wght@400;500&display=swap">
+<style>
+/* Layout: navy masthead → sticky action bar → form (left) beside a live A4 preview of the real sheet (right); print renders 2 A4 pages: Original + Copy */
+:root {
+  --bg: #eef1f3; --surface: #ffffff; --surface-2: #f5f7f8; --fg: #14212b; --muted: #5a6b78; --line: #d5dde3;
+  --ink: #0f2a3d; --ink-fg: #eaf1f6; --accent: #f2b705; --accent-ink: #231a00;
+  --primary: #12466b; --primary-fg: #ffffff; --danger: #b8382b; --danger-bg: #fbeceb; --ok: #2f7a4f; --line-green: #06a046;
+  --paper-shadow: 0 1px 2px rgba(15,42,61,.08), 0 18px 40px -18px rgba(15,42,61,.45);
+  --font-display: "Chakra Petch", "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Thai", "Sarabun", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  /* ฟอนต์บนใบพิมพ์ — เลียนแบบฟอร์มต้นฉบับ (Times + ตัวกรอกสีน้ำเงิน) */
+  --paper-serif: "Times New Roman", Tinos, Times, serif;
+  --paper-thai: "TH Sarabun New", Sarabun, Tahoma, sans-serif;
+  --paper-fill: Arial, Arimo, Tahoma, Sarabun, sans-serif;
+  --paper-fill-color: #102a83;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c151c; --surface: #13212c; --surface-2: #182a37; --fg: #e4ebf0; --muted: #93a4b1; --line: #24384a;
+    --ink: #08131c; --ink-fg: #e4ebf0; --accent: #f5c22b; --accent-ink: #231a00;
+    --primary: #4c9bd1; --primary-fg: #04121c; --danger: #ef7b6d; --danger-bg: #3a1a17; --ok: #5cc28a; --line-green: #3fd47d;
+    --paper-shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px -18px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c151c; --surface: #13212c; --surface-2: #182a37; --fg: #e4ebf0; --muted: #93a4b1; --line: #24384a;
+  --ink: #08131c; --ink-fg: #e4ebf0; --accent: #f5c22b; --accent-ink: #231a00;
+  --primary: #4c9bd1; --primary-fg: #04121c; --danger: #ef7b6d; --danger-bg: #3a1a17; --ok: #5cc28a; --line-green: #3fd47d;
+  --paper-shadow: 0 1px 2px rgba(0,0,0,.4), 0 18px 40px -18px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); }
+body { margin: 0; color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.masthead { background: var(--ink); color: var(--ink-fg); }
+.masthead .wrap { padding-block: 22px 20px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; }
+.brand { display: grid; gap: 3px; min-width: 0; }
+.backlink { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-fg); opacity: .8; text-decoration: none; font-size: 13px; margin-bottom: 4px; width: fit-content; }
+.backlink:hover { opacity: 1; text-decoration: underline; }
+.backlink svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .72; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 4.4vw, 36px); line-height: 1.05; text-wrap: balance; }
+.brand p { margin: 0; opacity: .8; font-size: 14.5px; }
+.jobtag { display: flex; background: var(--accent); color: var(--accent-ink); border-radius: 6px; font-family: var(--font-mono); font-size: 12px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset; }
+.jobtag div { padding: 6px 12px; display: grid; line-height: 1.2; }
+.jobtag div + div { border-left: 1px dashed rgba(35,26,0,.4); }
+.jobtag b { font-family: var(--font-display); font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.jobtag span { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.preview-note { background: var(--surface-2); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.preview-note .wrap { padding-block: 8px; }
+
+.actionbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.actionbar .wrap { padding-block: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.open-job { display: flex; gap: 6px; flex: 1 1 260px; min-width: 0; }
+.open-job input { flex: 1; min-width: 0; height: 40px; border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; background: var(--surface); }
+.btn { height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-weight: 500; white-space: nowrap; text-decoration: none; color: var(--fg); }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+.btn.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn[disabled] { opacity: .55; cursor: progress; }
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.status-pill { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding: 0 4px; }
+.status-pill.dirty { color: var(--danger); }
+.status-pill.saved { color: var(--ok); }
+.line-toggle { gap: 8px; padding: 0 12px 0 10px; }
+.line-toggle .box { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--muted); display: grid; place-items: center; }
+.line-toggle[aria-pressed="true"] { border-color: var(--line-green); color: var(--line-green); }
+.line-toggle[aria-pressed="true"] .box { background: var(--line-green); border-color: var(--line-green); }
+.line-toggle[aria-pressed="true"] .box::after { content: ""; width: 8px; height: 4px; border: 2px solid #fff; border-top: 0; border-right: 0; rotate: -45deg; translate: 0 -1px; }
+#pdfStage { position: fixed; left: -10000px; top: 0; }
+
+.viewtabs { display: none; }
+main .wrap { padding-block: 18px 60px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); gap: 22px; align-items: start; }
+
+/* ---- form ---- */
+form { display: grid; gap: 14px; min-width: 0; }
+.sec { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px 16px; display: grid; gap: 12px; min-width: 0; }
+.sec h2 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 600; letter-spacing: .02em; display: flex; align-items: baseline; gap: 8px; }
+.sec h2 small { font-family: var(--font-body); font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 12px; }
+.field { display: grid; gap: 4px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label, .flabel { font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 8px 10px; min-height: 40px; }
+.field textarea { resize: vertical; min-height: 62px; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent); border-color: var(--primary); }
+.hint { font-size: 12px; color: var(--muted); }
+.hint.warn { color: var(--danger); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { min-height: 36px; padding: 0 12px 0 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; }
+.seg button .box { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--muted); display: grid; place-items: center; flex: none; }
+.seg.radio button .box { border-radius: 50%; }
+.seg button[aria-pressed="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--surface)); }
+.seg button[aria-pressed="true"] .box { background: var(--primary); border-color: var(--primary); }
+.seg button[aria-pressed="true"] .box::after { content: ""; width: 8px; height: 4px; border: 2px solid var(--primary-fg); border-top: 0; border-right: 0; rotate: -45deg; translate: 0 -1px; }
+.seg.radio button[aria-pressed="true"] .box::after { width: 6px; height: 6px; border: 0; border-radius: 50%; background: var(--primary-fg); rotate: none; translate: none; }
+.row-inline { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+
+.maker-card { display: flex; gap: 10px; align-items: center; border: 1px dashed var(--line); border-radius: 8px; padding: 8px 10px; background: var(--surface-2); font-size: 13px; min-width: 0; }
+.maker-card .mono { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; color: #fff; background: #1f4e6e; font-family: var(--font-display); font-weight: 700; font-size: 13px; flex: none; }
+.maker-card .logo { width: 60px; height: 34px; background: #fff; border-radius: 6px; border: 1px solid var(--line); flex: none; display: grid; place-items: center; overflow: hidden; }
+.maker-card .logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.maker-card .info { min-width: 0; flex: 1; display: grid; }
+.maker-card .info b { font-weight: 600; overflow-wrap: anywhere; }
+.maker-card .info span { color: var(--muted); overflow-wrap: anywhere; font-size: 12.5px; }
+.maker-card a { white-space: nowrap; color: var(--primary); font-size: 12.5px; }
+
+.reply-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.reply-list button { justify-content: flex-start; text-align: left; height: auto; min-height: 40px; padding: 6px 10px 6px 9px; }
+.reply-list button span.t { display: grid; line-height: 1.25; min-width: 0; }
+.reply-list button small { color: var(--muted); font-family: var(--font-mono); font-size: 11px; overflow-wrap: anywhere; }
+.sigs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.sig { border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 8px; min-width: 0; }
+.sig .flabel { font-weight: 600; color: var(--fg); }
+.sig .pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.sig input { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 7px 9px; min-height: 38px; }
+.sig input:focus { outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent); border-color: var(--primary); }
+.err { color: var(--danger); font-size: 13.5px; background: var(--danger-bg); padding: 8px 12px; border-radius: 8px; }
+
+/* ---- live preview ---- */
+.preview-col { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 10px; min-width: 0; }
+.preview-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.preview-head b { font-family: var(--font-display); color: var(--fg); font-size: 14px; }
+.paper-frame { width: 100%; aspect-ratio: 210 / 297; position: relative; overflow: hidden; border-radius: 4px; box-shadow: var(--paper-shadow); background: #fff; }
+.paper-frame .sheet { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+
+/* ---- the printed sheet (always white paper, real A4 units) ---- */
+.sheet { width: 210mm; height: 297mm; background: #fff; color: #000; position: relative; font-family: var(--paper-serif); font-size: 16.5pt; line-height: 1; overflow: hidden; }
+.sheet .box { position: absolute; inset: 8.5mm 8.6mm 6.8mm 8.6mm; border: .9pt solid #000; padding: 2.2mm 4mm 0 4mm; }
+.sheet .hd { display: flex; align-items: flex-start; gap: 4.4mm; padding-left: .6mm; }
+.sheet .logo-word { font-family: Georgia, Tinos, "Times New Roman", serif; font-weight: 700; font-size: 30pt; color: #1c3f91; letter-spacing: .2pt; padding-top: 4.2mm; line-height: 1; transform: scaleX(1.06); transform-origin: left; }
+.sheet .co { font-size: 12.4pt; line-height: 1.1; }
+.sheet .co .n { font-size: 17.4pt; line-height: 1.1; }
+.sheet .orig { display: flex; align-items: flex-end; gap: 1mm; margin: .4mm 0 0 7mm; }
+.sheet .orig .dash { flex: 1; border-bottom: .9pt dashed #000; margin-bottom: 1.2mm; }
+.sheet .orig span { color: #e00; font-size: 15pt; line-height: 1; }
+.sheet .title { text-align: center; font-weight: 700; font-size: 19pt; margin: .2mm 0 0; display: flex; justify-content: center; align-items: center; gap: 2.2mm; }
+.sheet .title u { text-underline-offset: 1.2pt; text-decoration-thickness: 1.2pt; }
+.sheet .ln { display: flex; align-items: flex-end; height: 7.78mm; white-space: nowrap; gap: 0; }
+.sheet .th { font-family: var(--paper-thai); font-size: 10.2pt; }
+.sheet .dots { flex: 1; position: relative; height: 4mm; margin: 0 .4mm 1.15mm; min-width: 6mm; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='11' viewBox='0 0 16 11'%3E%3Ccircle cx='8' cy='5.5' r='2.3' fill='%23000'/%3E%3C/svg%3E"); background-position: left bottom; background-size: 1.62mm 1.1mm; background-repeat: repeat-x; }
+.sheet .dots.w { flex: none; }
+.sheet .dots .v { position: absolute; left: 0; right: 0; bottom: .55mm; text-align: center; font-family: var(--paper-fill); font-size: 10.8pt; color: var(--paper-fill-color); overflow: hidden; text-overflow: clip; white-space: nowrap; }
+.sheet .dots .v.l { text-align: left; padding-left: 2mm; }
+.sheet .dots .v.sm { font-size: 8pt; }
+.sheet .cb { display: inline-block; width: 4.1mm; height: 4.1mm; border: .8pt solid #000; position: relative; margin: 0 .9mm 0 0; vertical-align: -.2mm; flex: none; }
+.sheet .cb.on::after { content: ""; position: absolute; left: 1.25mm; top: .3mm; width: 1.1mm; height: 2.3mm; border: solid #000; border-width: 0 1pt 1pt 0; transform: rotate(40deg); }
+.sheet .opt { display: inline-flex; align-items: center; }
+.sheet .staff .cb { margin-right: 1.8mm; }
+.sheet .gap1 { width: 2.4mm; flex: none; } .sheet .gap2 { width: 5.5mm; flex: none; } .sheet .gap3 { width: 7.5mm; flex: none; }
+.sheet .ind { width: 59mm; flex: none; }
+.sheet .note { text-align: center; font-size: 14pt; line-height: 1.2; margin-top: .9mm; }
+.sheet .staff { margin: 1.3mm 0 0 4.4mm; }
+.sheet .staff .r { display: flex; align-items: center; height: var(--sr, 5.62mm); font-size: 14pt; }
+.sheet .staff .r .nm { width: 73mm; display: flex; align-items: center; }
+.sheet .sg { display: grid; grid-template-columns: 1fr 1fr; margin-top: 5.6mm; row-gap: 3.4mm; }
+.sheet .sg .c { display: grid; justify-items: center; gap: 1.3mm; }
+.sheet .sg .l { display: flex; align-items: flex-end; height: 5mm; }
+.sheet .sg .l .dots { flex: none; margin-bottom: .6mm; }
+.sheet .sg b { font-size: 11pt; }
+.sheet .pg { position: absolute; left: 0; right: 0; bottom: .6mm; text-align: center; font-size: 11.2pt; }
+.sheet .created { position: absolute; left: 0; right: 0; bottom: 3.3mm; text-align: center; font-size: 8.3pt; }
+
+#printRoot { display: none; }
+@page { size: A4; margin: 0; }
+@media print {
+  html, body { background: #fff !important; }
+  body::before { display: none; }
+  body > *:not(#printRoot) { display: none !important; }
+  #printRoot { display: block; }
+  #printRoot .sheet { page-break-after: always; break-after: page; }
+  #printRoot .sheet:last-child { page-break-after: auto; break-after: auto; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); translate: -50% 20px; opacity: 0; background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 100; pointer-events: none; transition: opacity .2s, translate .2s; max-width: calc(100vw - 32px); }
+#toast.show { opacity: 1; translate: -50% 0; }
+#toast.bad { background: var(--danger); color: #fff; }
+
+@media (max-width: 980px) {
+  main .wrap { grid-template-columns: minmax(0, 1fr); }
+  .viewtabs { display: flex; gap: 6px; }
+  .viewtabs button { flex: 1; }
+  .viewtabs button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  body[data-view="form"] .preview-col { display: none; }
+  body[data-view="sheet"] form { display: none; }
+  .preview-col { position: static; max-width: 640px; width: 100%; margin: 0 auto; }
+}
+@media (max-width: 620px) {
+  .grid2, .grid3, .sigs { grid-template-columns: 1fr; }
+  .actionbar .btn .lbl { display: none; }
+  .actionbar .btn { padding: 0 11px; }
+  .open-job { flex-basis: 100%; order: 5; }
+  .viewtabs { flex-basis: 100%; order: 6; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <a class="backlink" data-nav="home" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>หน้าหลัก</a>
+      <div class="eyebrow">NDT-B · Service · Receive / Return</div>
+      <h1>Request Check Sheet</h1>
+      <p>กรอกใบรับ–คืนเครื่อง เลือก Maker จากรายชื่อ แล้วพิมพ์เป็น PDF (ต้นฉบับ + สำเนา)</p>
+    </div>
+    <div class="jobtag" aria-label="สถานะใบ">
+      <div><b id="tagJob">–</b><span>Job No.</span></div>
+      <div><b id="tagCount">–</b><span>ใบที่บันทึก</span></div>
+    </div>
+  </div>
+</header>
+<div class="preview-note" id="previewNote" hidden>
+  <div class="wrap">โหมดตัวอย่าง: กรอกและดูหน้าตาใบได้ แต่ไม่บันทึกลงชีต และหน้าต่างพิมพ์จะเปิดได้เฉพาะในเว็บแอป Apps Script จริง</div>
+</div>
+
+<div class="actionbar">
+  <div class="wrap">
+    <button class="btn" type="button" id="newBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">ใบใหม่</span></button>
+    <div class="open-job">
+      <input id="openJob" list="jobList" placeholder="เปิดใบเดิมด้วย Job No. (เช่นตอนคืนเครื่อง)" aria-label="Job No. ที่ต้องการเปิด" autocomplete="off" inputmode="numeric">
+      <button class="btn" type="button" id="openBtn">เปิด</button>
+    </div>
+    <span class="status-pill" id="saveState"></span>
+    <button class="btn line-toggle" type="button" id="lineToggle" aria-pressed="true" hidden title="ส่ง PDF เข้ากลุ่ม LINE พร้อมแท็ก Engineer ทุกครั้งที่บันทึก"><span class="box"></span>แจ้ง LINE</button>
+    <button class="btn" type="button" id="saveBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg><span class="lbl">บันทึก</span></button>
+    <button class="btn accent" type="button" id="printBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><path d="M7 14h10v7H7z"/></svg><span class="lbl">บันทึก + พิมพ์ PDF</span></button>
+    <div class="viewtabs" role="group" aria-label="มุมมอง">
+      <button class="btn" type="button" data-view="form" aria-pressed="true">กรอกข้อมูล</button>
+      <button class="btn" type="button" data-view="sheet" aria-pressed="false">ดูใบที่จะพิมพ์</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <form id="form" novalidate autocomplete="off">
+      <div class="err" id="formErr" hidden></div>
+
+      <section class="sec" aria-labelledby="h1">
+        <h2 id="h1">ข้อมูลใบงาน <small>Job No. / วันที่ / ประเภท</small></h2>
+        <div class="grid3">
+          <div class="field"><label for="f_jobNo">Job No. / ลำดับงานที่ *</label><input id="f_jobNo" inputmode="numeric"><span class="hint" id="jobHint"></span></div>
+          <div class="field"><label for="f_date">D/M/Y วันที่</label><input id="f_date" type="date"></div>
+          <div class="field"><span class="flabel">ประเภทใบ</span>
+            <div class="seg" data-multi="receive,ret"><button type="button" data-k="receive"><span class="box"></span>Receive</button><button type="button" data-k="ret"><span class="box"></span>Return</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="h2">
+        <h2 id="h2">NDT Staff <small>ผู้รับเครื่อง</small></h2>
+        <div class="grid2">
+          <div class="field"><span class="flabel">ตำแหน่ง</span>
+            <div class="seg radio" data-radio="staffType"><button type="button" data-v="Sales"><span class="box"></span>Sales</button><button type="button" data-v="Engineer"><span class="box"></span>Engineer</button></div>
+          </div>
+          <div class="field"><label for="f_staffName">ชื่อพนักงาน</label><select id="f_staffName"></select><span class="hint">เพิ่ม/แก้ชื่อและเบอร์มือถือได้ที่แท็บ Staff ในชีต</span></div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="h3">
+        <h2 id="h3">สถานะ และ ช่องทางขาย <small>Status / Sold by</small></h2>
+        <div class="row-inline">
+          <div class="seg radio" data-radio="warranty"><button type="button" data-v="in"><span class="box"></span>In warranty / ในประกัน</button><button type="button" data-v="out"><span class="box"></span>Out of warranty / นอกประกัน</button></div>
+          <div class="seg" data-multi="repair,calibrate"><button type="button" data-k="repair"><span class="box"></span>Repair / ซ่อมแซม</button><button type="button" data-k="calibrate"><span class="box"></span>Calibrate / สอบเทียบ</button></div>
+        </div>
+        <div class="field"><span class="flabel">Sold by / ขายโดย</span>
+          <div class="seg radio" data-radio="soldBy"><button type="button" data-v="NDT"><span class="box"></span>NDT</button><button type="button" data-v="Denkei Corporate Job"><span class="box"></span>Denkei Corporate Job</button><button type="button" data-v="Customer"><span class="box"></span>Customer</button><button type="button" data-v="Other"><span class="box"></span>Other</button></div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="h4">
+        <h2 id="h4">ลูกค้า <small>พิมพ์ชื่อลูกค้าเดิมแล้วระบบเติมข้อมูลติดต่อให้</small></h2>
+        <div class="grid2">
+          <div class="field full"><label for="f_customer">Customer Name / ชื่อลูกค้า *</label><input id="f_customer" list="customerList"></div>
+          <div class="field"><label for="f_userName">User Name / ชื่อผู้ใช้งาน</label><input id="f_userName"></div>
+          <div class="field"><label for="f_department">Department / แผนก</label><input id="f_department"></div>
+          <div class="field"><label for="f_email">E-mail</label><input id="f_email" type="email" inputmode="email"></div>
+          <div class="field"><label for="f_tel">Telephone or Mobile</label><input id="f_tel" inputmode="tel"></div>
+        </div>
+      </section>
+
+      <section class="sec" aria-labelledby="h5">
+        <h2 id="h5">เครื่อง <small>Maker เลือกจากรายชื่อ Maker &amp; Supplier</small></h2>
+        <div class="grid2">
+          <div class="field full"><label for="f_maker">Maker / ผู้ผลิต</label><input id="f_maker" list="makerList">
+            <div class="maker-card" id="makerCard" hidden></div>
+          </div>
+          <div class="field full"><label for="f_product">Product Name / ชื่อเครื่อง</label><input id="f_product"></div>
+          <div class="field"><label for="f_model">Model / รุ่น</label><input id="f_model"></div>
+          <div class="field"><label for="f_serial">Serial / หมายเลขเครื่อง</label><input id="f_serial"></div>
+        </div>
+        <div class="field"><span class="flabel">Input voltage / แรงดันไฟใช้งาน</span>
+          <div class="seg radio" data-radio="voltage"><button type="button" data-v="100V"><span class="box"></span>100V</button><button type="button" data-v="200V"><span class="box"></span>200V</button><button type="button" data-v="220V"><span class="box"></span>220V</button><button type="button" data-v="Auto 85 -240V"><span class="box"></span>Auto 85–240V</button></div>
+        </div>
+        <div class="row-inline">
+          <div class="seg radio" data-radio="phase"><button type="button" data-v="1Phase"><span class="box"></span>1 Phase</button><button type="button" data-v="3Phase"><span class="box"></span>3 Phase</button><button type="button" data-v="Other"><span class="box"></span>Other</button></div>
+          <div class="field" style="flex:1 1 160px"><input id="f_phaseOther" placeholder="ระบุ (ถ้าเลือก Other)" aria-label="Phase อื่น ๆ"></div>
+        </div>
+        <div class="field"><span class="flabel">Power cable / สายไฟ</span>
+          <div class="seg radio" data-radio="powerCable"><button type="button" data-v="Yes"><span class="box"></span>Yes</button><button type="button" data-v="No"><span class="box"></span>No</button></div>
+        </div>
+        <div class="field"><label for="f_symptom">Symptom / อาการเสีย</label><textarea id="f_symptom" rows="2" placeholder="Inspection"></textarea><span class="hint" id="symHint"></span></div>
+      </section>
+
+      <section class="sec" aria-labelledby="h7">
+        <h2 id="h7">ลงชื่อ / วันที่ <small>เว้นว่างไว้ได้ เพื่อเซ็นด้วยมือ</small></h2>
+        <div class="sigs">
+          <div class="sig"><span class="flabel">NDT staff / Receive date</span><div class="pair"><input class="sgi" id="s_recvStaff" aria-label="NDT staff ผู้รับ"><input class="sgi" id="s_recvDate" type="date" aria-label="วันที่รับ"></div></div>
+          <div class="sig"><span class="flabel">Customer staff / Sent out date</span><div class="pair"><input class="sgi" id="s_custSent" aria-label="ลูกค้าผู้ส่ง"><input class="sgi" id="s_custSentDate" type="date" aria-label="วันที่ส่ง"></div></div>
+          <div class="sig"><span class="flabel">NDT staff / Return date</span><div class="pair"><input class="sgi" id="s_retStaff" aria-label="NDT staff ผู้คืน"><input class="sgi" id="s_retDate" type="date" aria-label="วันที่คืน"></div></div>
+          <div class="sig"><span class="flabel">Customer staff / Return date</span><div class="pair"><input class="sgi" id="s_custRet" aria-label="ลูกค้าผู้รับคืน"><input class="sgi" id="s_custRetDate" type="date" aria-label="วันที่ลูกค้ารับคืน"></div></div>
+        </div>
+      </section>
+    </form>
+
+    <aside class="preview-col" aria-label="ตัวอย่างใบที่จะพิมพ์">
+      <div class="preview-head"><b>ตัวอย่างใบ (หน้า 1 · Original)</b><span>พิมพ์ออกมา 2 หน้า: Original + Copy</span></div>
+      <div class="paper-frame" id="paperFrame"></div>
+    </aside>
+  </div>
+</main>
+
+<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.01 · Request Check Sheet</footer>
+<div id="printRoot" aria-hidden="true"></div>
+<datalist id="makerList"></datalist>
+<datalist id="customerList"></datalist>
+<datalist id="jobList"></datalist>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>var APP_URL = <?= appUrl ?>;</script>
+<?!= include('Nav') ?>
+<script>
+(function () {
+  'use strict';
+  const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => [...(r || document).querySelectorAll(s)];
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // ---------- โหมดตัวอย่าง (เปิดนอก Apps Script) ----------
+  const PREVIEW = {
+    makers: (typeof PREVIEW_ROWS !== 'undefined' ? PREVIEW_ROWS : []),
+    staff: [
+      ['Mr. Hirofumi Yachi', '', 'yachi@n-denkei.co.th'], ['Mr. Wisut Saphoemsap', '', 'wisut@n-denkei.co.th'],
+      ['Mr. Poontana Munkong', '', 'poontana@n-denkei.co.th'], ['Mr. Suphawat Prakaew', '', 'suphawat@n-denkei.co.th'],
+      ['Mr. Teerapol Rattanachart', '', 'teerapol@n-denkei.co.th'], ['Mr. Thanawat Amornsriserm', '', 'thanawat@n-denkei.co.th'],
+      ['Mr. Witchanon Anonsathian', '', 'witchanon@n-denkei.co.th'], ['Mr. Sabsit Sungsri', '', 'sabsit@n-denkei.co.th']
+    ].map(r => ({ name: r[0], mobile: r[1], email: r[2], role: 'Engineer', reply: true })),
+    saved: {
+      '2326': { jobNo: '2326', date: '2026-10-07', receive: true, ret: false, staffType: 'Engineer', staffName: 'Mr. Sabsit Sungsri', warranty: 'out', repair: true, calibrate: false, soldBy: '',
+        customer: 'AIRCON TECH CO.,LTD.', userName: 'คุณบุปผา สุขลักษณ์', department: 'Production', email: 'Production@caircontech.com', tel: '081-496-6508',
+        maker: 'Kikusui', product: 'Insulation Resistance Tester', model: 'TOS7200', serial: 'JD000930', voltage: '', phase: '', phaseOther: '', powerCable: '', symptom: 'Inspection',
+        replyTo: ['sabsit@n-denkei.co.th'], sig: { recvStaff: 'Sabsit.S', recvDate: '2026-10-07', custSent: '', custSentDate: '2026-10-07', retStaff: '', retDate: '', custRet: '', custRetDate: '' } }
+    }
+  };
+  const mock = {
+    init() {
+      const list = Object.values(PREVIEW.saved);
+      const max = Math.max(0, ...list.map(d => parseFloat(d.jobNo) || 0));
+      return { makers: PREVIEW.makers, staff: PREVIEW.staff, nextJobNo: max ? String(max + 1) : '',
+        customers: list.map(d => ({ customer: d.customer, userName: d.userName, department: d.department, email: d.email, tel: d.tel })),
+        recent: list.map(d => ({ jobNo: d.jobNo, date: d.date, customer: d.customer, product: d.product, maker: d.maker, model: d.model })), lineEnabled: true };
+    },
+    getRequestInit() { return later(this.init()); },
+    getRequest(no) { const d = PREVIEW.saved[String(no).trim()]; return d ? later(JSON.parse(JSON.stringify(d))) : Promise.reject(new Error('ไม่พบใบ Job No. ' + no)); },
+    saveRequest(d) {
+      if (!String(d.jobNo || '').trim()) return Promise.reject(new Error('กรุณากรอก Job No.'));
+      if (!String(d.customer || '').trim()) return Promise.reject(new Error('กรุณากรอกชื่อลูกค้า (Customer Name)'));
+      const updated = !!PREVIEW.saved[d.jobNo]; PREVIEW.saved[d.jobNo] = JSON.parse(JSON.stringify(d));
+      return later({ jobNo: d.jobNo, updated, init: this.init() });
+    },
+    sendRequestToLine(no, pdf) { PREVIEW.lastPdf = pdf; return later({ pdfUrl: '#', sent: true, tagged: true, staff: (PREVIEW.saved[no] || {}).staffName || '', preview: true }); }
+  };
+  function later(v) { return new Promise(r => setTimeout(() => r(v), 200)); }
+  function api(fn, ...args) {
+    if (!HAS_GAS) return mock[fn](...args);
+    return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+  }
+  const msgOf = err => String((err && (err.message || err)) || 'เกิดข้อผิดพลาด').replace(/^Exception:\s*/, '');
+
+  // ---------- helpers ----------
+  const clean = s => String(s || '').replace(/\s+/g, ' ').trim();
+  function groupKey(name) { return String(name || '').replace(/\([^)]*\)\s*$/, ' ').toLowerCase().replace(/[^a-z0-9฀-๿]+/g, ''); }
+  function baseName(name) { return String(name || '').replace(/\([^)]*\)\s*$/, '').replace(/\s+/g, ' ').trim(); }
+  function todayISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function fmtDate(iso) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? (+m[3]) + '-' + MONTHS[+m[2] - 1] + '-' + m[1] : (iso || ''); }
+  function fmtJob(no) { const s = clean(no); return /^\d{4,}$/.test(s) ? Number(s).toLocaleString('en-US') : s; }
+  function staffLabel(s) { if (!s) return ''; return s.name.replace(/^(Mr|Ms|Mrs|Miss)\.\s+/, '$1.') + (s.mobile ? ' / Mobile : ' + s.mobile : ''); }
+  function shortSig(name) { const p = String(name || '').replace(/^(Mr|Ms|Mrs|Miss)\.\s*/i, '').trim().split(/\s+/); return p[0] ? p[0] + (p[1] ? '.' + p[1][0].toUpperCase() : '') : ''; }
+  function initials(name) { const w = baseName(name).replace(/[^A-Za-z0-9฀-๿]+/g, ' ').split(/\s+/).filter(x => x && !/^(co|ltd|corp|inc|the)$/i.test(x)); return w.length ? (w[0][0] + (w[1] ? w[1][0] : (w[0][1] || ''))).toUpperCase() : '?'; }
+  function driveId(url) { const m = /[?&]id=([\w-]{20,})/.exec(url) || /\/d\/([\w-]{20,})/.exec(url); return m ? m[1] : ''; }
+
+  // ---------- state ----------
+  const state = { makers: [], makerGroups: [], staff: [], customers: [], recent: [], dirty: false, lastSaved: '' };
+  const TEXT = ['jobNo', 'date', 'customer', 'userName', 'department', 'email', 'tel', 'maker', 'product', 'model', 'serial', 'phaseOther', 'symptom'];
+  const SIG = ['recvStaff', 'recvDate', 'custSent', 'custSentDate', 'retStaff', 'retDate', 'custRet', 'custRetDate'];
+  const RADIO = ['staffType', 'warranty', 'soldBy', 'voltage', 'phase', 'powerCable'];
+  const MULTI = ['receive', 'ret', 'repair', 'calibrate'];
+
+  function blank() {
+    return { jobNo: '', date: todayISO(), receive: true, ret: false, staffType: 'Engineer', staffName: '', warranty: '', repair: false, calibrate: false, soldBy: '',
+      customer: '', userName: '', department: '', email: '', tel: '', maker: '', product: '', model: '', serial: '', voltage: '', phase: '', phaseOther: '', powerCable: '', symptom: '',
+      replyTo: [], sig: { recvStaff: '', recvDate: todayISO(), custSent: '', custSentDate: todayISO(), retStaff: '', retDate: '', custRet: '', custRetDate: '' } };
+  }
+
+  function readForm() {
+    const d = blank();
+    TEXT.forEach(k => d[k] = $('#f_' + k).value.trim());
+    d.symptom = $('#f_symptom').value.replace(/\s+$/, '');
+    d.staffName = $('#f_staffName').value;
+    RADIO.forEach(k => { const b = $('[data-radio="' + k + '"] [aria-pressed="true"]'); d[k] = b ? b.dataset.v : ''; });
+    MULTI.forEach(k => { const b = $('[data-k="' + k + '"]'); d[k] = b.getAttribute('aria-pressed') === 'true'; });
+    const me = state.staff.find(x => x.name === d.staffName);
+    d.replyTo = me && me.email ? [me.email] : [];   // ในใบติ๊กให้อัตโนมัติ = พนักงานที่รับเครื่อง
+    SIG.forEach(k => d.sig[k] = $('#s_' + k).value.trim());
+    return d;
+  }
+
+  function writeForm(d) {
+    d = Object.assign(blank(), d || {}); d.sig = Object.assign(blank().sig, d.sig || {});
+    TEXT.forEach(k => $('#f_' + k).value = d[k] || '');
+    ensureStaffOption(d.staffName);
+    $('#f_staffName').value = d.staffName || '';
+    RADIO.forEach(k => $$('[data-radio="' + k + '"] button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === d[k])));
+    MULTI.forEach(k => $('[data-k="' + k + '"]').setAttribute('aria-pressed', !!d[k]));
+    SIG.forEach(k => $('#s_' + k).value = d.sig[k] || '');
+    updateMakerCard(); render();
+  }
+
+  // ---------- lists ----------
+  function setInit(res) {
+    state.makers = res.makers || []; state.staff = res.staff || []; state.customers = res.customers || []; state.recent = res.recent || [];
+    state.nextJobNo = res.nextJobNo || '';
+    state.lineEnabled = !!res.lineEnabled;
+    $('#lineToggle').hidden = !state.lineEnabled;
+    const groups = new Map();
+    state.makers.forEach(r => {
+      const k = groupKey(r.company); if (!k) return;
+      if (!groups.has(k)) groups.set(k, { key: k, name: '', rows: [] });
+      groups.get(k).rows.push(r);
+    });
+    state.makerGroups = [...groups.values()].map(g => {
+      g.name = g.rows.length > 1 ? baseName(g.rows[0].company) : clean(g.rows[0].company);
+      g.logo = (g.rows.find(r => r.logo) || {}).logo || '';
+      g.country = clean(g.rows[0].country);
+      g.service = g.rows.find(r => clean(r.servicePic)) || g.rows[0];
+      return g;
+    }).sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+    $('#makerList').innerHTML = state.makerGroups.map(g => '<option value="' + esc(g.name) + '">').join('');
+    $('#customerList').innerHTML = [...new Set(state.customers.map(c => c.customer))].map(c => '<option value="' + esc(c) + '">').join('');
+    $('#jobList').innerHTML = state.recent.map(r => '<option value="' + esc(r.jobNo) + '">' + esc([fmtDate(r.date), r.customer, r.product].filter(Boolean).join(' · ')) + '</option>').join('');
+    const sel = $('#f_staffName'), cur = sel.value;
+    sel.innerHTML = '<option value="">— เลือกพนักงาน —</option>' + state.staff.map(s => '<option value="' + esc(s.name) + '">' + esc(staffLabel(s)) + '</option>').join('');
+    ensureStaffOption(cur); sel.value = cur;
+    $('#tagCount').textContent = state.recent.length >= 30 ? '30+' : state.recent.length;
+    jobHint();
+  }
+  function ensureStaffOption(name) {
+    if (!name || $$('#f_staffName option').some(o => o.value === name)) return;
+    const o = document.createElement('option'); o.value = name; o.textContent = name; $('#f_staffName').appendChild(o);
+  }
+  const replyStaff = () => state.staff.filter(s => s.reply !== false && s.email);
+  function jobHint() {
+    const v = $('#f_jobNo').value.trim();
+    const exists = v && state.recent.some(r => r.jobNo === v);
+    $('#jobHint').textContent = exists ? 'มีใบนี้แล้ว — บันทึกจะเขียนทับใบเดิม' : (state.nextJobNo ? 'เลขถัดไปจากที่บันทึกไว้: ' + state.nextJobNo : '');
+    $('#jobHint').classList.toggle('warn', !!exists);
+    $('#tagJob').textContent = v ? fmtJob(v) : '–';
+  }
+
+  function findMaker(name) { const k = groupKey(name); if (!k) return null; return state.makerGroups.find(g => g.key === k) || state.makerGroups.find(g => g.key.startsWith(k) && k.length >= 3) || null; }
+  function updateMakerCard() {
+    const v = $('#f_maker').value.trim(), g = findMaker(v), card = $('#makerCard');
+    if (!v) { card.hidden = true; return; }
+    if (!g) {
+      card.innerHTML = '<div class="info"><b>ยังไม่มีในรายชื่อ Maker</b><span>พิมพ์ชื่อไว้ได้ตามปกติ หรือเพิ่มเข้า Maker Directory</span></div><a data-nav="makers" data-q="' + esc(v) + '" href="#">เพิ่ม Maker →</a>';
+    } else {
+      const id = /^https?:/.test(g.logo) ? driveId(g.logo) : '';
+      const src = g.logo ? (id ? 'https://lh3.googleusercontent.com/d/' + id + '=w200' : g.logo) : '';
+      const svc = g.service || {};
+      card.innerHTML = (src ? '<div class="logo"><img alt="" src="' + esc(src) + '"></div>' : '<div class="mono">' + esc(initials(g.name)) + '</div>') +
+        '<div class="info"><b>' + esc(g.name) + '</b><span>' + esc([g.country, clean(svc.servicePic) ? 'Service: ' + clean(svc.servicePic) : ''].filter(Boolean).join(' · ')) + '</span></div>' +
+        '<a data-nav="makers" data-q="' + esc(g.name) + '" href="#">ดูรายละเอียด →</a>';
+    }
+    card.hidden = false;
+    if (window.wireNav) window.wireNav();
+  }
+
+  // ---------- the sheet (print layout) ----------
+  const cb = on => '<span class="cb' + (on ? ' on' : '') + '"></span>';
+  const dots = (v, opts) => { opts = opts || {}; return '<span class="dots' + (opts.w ? ' w' : '') + '"' + (opts.w ? ' style="width:' + opts.w + 'mm"' : '') + '><span class="v' + (opts.cls ? ' ' + opts.cls : '') + '">' + esc(v || '') + '</span></span>'; };
+  function sheetHTML(d, label, page) {
+    const st = state.staff.find(s => s.name === d.staffName);
+    const staffText = st ? staffLabel(st) : (d.staffName || '');
+    const reply = replyStaff();
+    const rowH = reply.length > 8 ? (5.62 * 8 / reply.length).toFixed(2) + "mm" : "5.62mm";
+    const s = d.sig || {};
+    const sym = String(d.symptom || '').split('\n');
+    const sym1 = sym[0] || '', sym2 = sym.slice(1).join(' ');
+    const line = (en, th, v, cls) => '<div class="ln">' + en + (th ? '&nbsp;/&nbsp;<span class="th">' + th + '</span>' : '') + '&nbsp;:' + dots(v, { cls }) + '</div>';
+    return '<div class="sheet"><div class="box">' +
+      '<div class="hd"><div class="logo-word">Denkei</div><div class="co"><div class="n">Nihon Denkei (Thailand) Co., Ltd.</div>43 Thai CC Tower, 30<sup style="font-size:7pt">th</sup> Fl., Room 304-305 South Sathorn Rd.,<br>Yannawa, Sathorn, Bangkok 10120 Thailand.<br>Tel:(66)-2672-3014-5, (662) 675 5688-91 Fax:(662) 675 5692</div></div>' +
+      '<div class="orig"><span class="dash"></span><span>' + label + '</span></div>' +
+      '<div class="title"><u>Request Check Sheet</u> / <span class="opt">' + cb(d.receive) + 'Receive</span> / <span class="opt">' + cb(d.ret) + 'Return</span></div>' +
+      '<div class="ln">Job No.&nbsp;/&nbsp;<span class="th">ลำดับงานที่</span>&nbsp;:' + dots(fmtJob(d.jobNo), { w: 41 }) + '<span class="gap1"></span>D/M/Y:<span class="th">วัน/เดือน/ปี</span>&nbsp;:' + dots(fmtDate(d.date), { cls: 'sm' }) + '</div>' +
+      '<div class="ln">NDT Staff <span class="gap1"></span><span class="opt">' + cb(d.staffType === 'Sales') + 'Sales</span><span class="gap1"></span><span class="opt">' + cb(d.staffType === 'Engineer') + 'Engineer</span>&nbsp;:' + dots(staffText, { cls: 'l' }) + '</div>' +
+      '<div class="ln">Status&nbsp;/&nbsp;<span class="th">สถานะ</span>&nbsp;: <span class="gap1"></span><span class="opt">' + cb(d.warranty === 'in') + 'In warranty/<span class="th">ในประกัน</span></span><span class="gap1"></span><span class="opt">' + cb(d.warranty === 'out') + 'Out of warranty/<span class="th">นอกประกัน</span></span></div>' +
+      '<div class="ln"><span style="width:36.5mm;flex:none"></span><span class="opt">' + cb(d.repair) + 'Repair/<span class="th">ซ่อมแซม</span></span><span style="width:15mm;flex:none"></span><span class="opt">' + cb(d.calibrate) + 'Calibrate/<span class="th">สอบเทียบ</span></span></div>' +
+      '<div class="ln">Sold by&nbsp;/&nbsp;<span class="th">ขายโดย</span>&nbsp;: <span class="opt">' + cb(d.soldBy === 'NDT') + 'NDT</span><span class="gap2"></span><span class="opt">' + cb(d.soldBy === 'Denkei Corporate Job') + 'Denkei Corporate Job</span><span class="gap2"></span><span class="opt">' + cb(d.soldBy === 'Customer') + 'Customer</span><span class="gap3"></span><span class="opt">' + cb(d.soldBy === 'Other') + 'Other</span></div>' +
+      line('Customer Name', 'ชื่อลูกค้า', d.customer) +
+      line('User Name', 'ชื่อผู้ใช้งาน', d.userName) +
+      line('Department', 'แผนก', d.department) +
+      line('E-mail', 'จดหมายอิเล็กทรอนิกส์', d.email) +
+      line('Telephone or Mobile', 'เบอร์โทรติดต่อ', d.tel) +
+      line('Maker', 'ผู้ผลิต', d.maker) +
+      '<div class="ln">Product Name : <span class="th">ชื่อเครื่อง</span>:' + dots(d.product) + '</div>' +
+      '<div class="ln">Model&nbsp;/&nbsp;<span class="th">รุ่น</span>&nbsp;:' + dots(d.model, { w: 58 }) + 'Serial&nbsp;/&nbsp;<span class="th">หมายเลขเครื่อง</span>&nbsp;:' + dots(d.serial) + '</div>' +
+      '<div class="ln">Input voltage&nbsp;/&nbsp;<span class="th">แรงดันไฟใช้งาน</span>&nbsp;:<span class="opt">' + cb(d.voltage === '100V') + '100V</span><span class="gap2"></span><span class="opt">' + cb(d.voltage === '200V') + '200V</span><span class="gap1"></span><span class="opt">' + cb(d.voltage === '220V') + '220V</span><span class="gap1"></span><span class="opt">' + cb(d.voltage === 'Auto 85 -240V') + 'Auto 85 -240V</span></div>' +
+      '<div class="ln"><span class="ind"></span>:<span class="opt">' + cb(d.phase === '1Phase') + '1Phase</span><span class="gap1"></span><span class="opt">' + cb(d.phase === '3Phase') + '3Phase</span><span class="opt">' + cb(d.phase === 'Other') + 'Other</span>' + dots(d.phase === 'Other' ? d.phaseOther : '', { cls: 'l' }) + '</div>' +
+      '<div class="ln">Power cable&nbsp;/&nbsp;<span class="th">สายไฟ</span><span style="width:16mm;flex:none"></span>:<span class="opt">' + cb(d.powerCable === 'Yes') + ' Yes</span><span style="width:12mm;flex:none"></span><span class="opt">' + cb(d.powerCable === 'No') + 'No</span></div>' +
+      '<div class="ln">Symptom&nbsp;/&nbsp;<span class="th">อาการเสีย</span></div>' +
+      '<div class="ln" style="padding-left:7mm">' + dots(sym1, { cls: 'l' }) + '</div>' +
+      '<div class="ln" style="padding-left:7mm">' + dots(sym2, { cls: 'l' }) + '</div>' +
+      '<div class="note">Please reply information to service department by E-mail are following.<br>Then you will get appointments from us as soon as possible.</div>' +
+      '<div class="staff" style="--sr:' + rowH + '">' + reply.map((p, i) =>
+        '<div class="r"><span class="nm">' + cb((d.replyTo || []).includes(p.email)) + (i + 1) + ') ' + esc(p.name) + '</span>E-mail : ' + esc(p.email) + '</div>').join('') + '</div>' +
+      '<div class="sg">' +
+        sigCell(s.recvStaff, s.recvDate, 'NDT staff &nbsp;/ &nbsp;Receive date') + sigCell(s.custSent, s.custSentDate, 'Customer staff / Sent out date') +
+        sigCell(s.retStaff, s.retDate, 'NDT staff &nbsp;/ &nbsp;Return date') + sigCell(s.custRet, s.custRetDate, 'Customer staff / Return date') +
+      '</div>' +
+      '<div class="pg">Page <b>' + page + '</b> of <b>2</b></div>' +
+      '</div><div class="created">Created by Mr.Wisut Saphoemsap (Revised on 3/May/2025)</div></div>';
+  }
+  function sigCell(name, date, cap) {
+    return '<div class="c"><div class="l">' + dots(name, { w: 23 }) + '/' + dots(fmtDate(date), { w: 25 }) + '</div><b>' + cap + '</b></div>';
+  }
+
+  function render() {
+    const d = readForm();
+    $('#paperFrame').innerHTML = sheetHTML(d, 'Original', 1);
+    fitPaper();
+    jobHint();
+    const lines = String(d.symptom).split('\n').length;
+    $('#symHint').textContent = lines > 2 || d.symptom.length > 150 ? 'ข้อความยาวเกินพื้นที่ในใบ (2 บรรทัด) — ส่วนที่เกินอาจถูกตัด' : '';
+    $('#symHint').classList.toggle('warn', lines > 2 || d.symptom.length > 150);
+  }
+  function fitPaper() {
+    const f = $('#paperFrame'), sh = f.querySelector('.sheet'); if (!sh) return;
+    const pxPerMm = sh.offsetWidth / 210 || 3.78;
+    sh.style.transform = 'scale(' + (f.clientWidth / (210 * pxPerMm)) + ')';
+  }
+  new ResizeObserver(fitPaper).observe($('#paperFrame'));
+
+  // ---------- dirty / save ----------
+  function markDirty() {
+    state.dirty = JSON.stringify(readForm()) !== state.lastSaved;
+    const p = $('#saveState');
+    p.textContent = state.dirty ? 'ยังไม่บันทึก' : (state.lastSaved ? 'บันทึกแล้ว' : '');
+    p.className = 'status-pill ' + (state.dirty ? 'dirty' : (state.lastSaved ? 'saved' : ''));
+  }
+  function showErr(m) { $('#formErr').textContent = m; $('#formErr').hidden = !m; if (m) $('#formErr').scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+
+  async function save() {
+    const d = readForm();
+    if (!d.jobNo) { showErr('กรุณากรอก Job No.'); $('#f_jobNo').focus(); throw new Error('no job'); }
+    if (!d.customer) { showErr('กรุณากรอกชื่อลูกค้า (Customer Name)'); $('#f_customer').focus(); throw new Error('no customer'); }
+    showErr('');
+    $('#saveBtn').disabled = $('#printBtn').disabled = true;
+    try {
+      const res = await api('saveRequest', d);
+      setInit(res.init);
+      state.lastSaved = JSON.stringify(d); markDirty();
+      toast((res.updated ? 'อัปเดตใบ Job No. ' : 'บันทึกใบ Job No. ') + fmtJob(res.jobNo) + ' แล้ว');
+      if (lineOn()) sendLine(d);
+      return d;
+    } catch (err) { toast(msgOf(err), true); throw err; }
+    finally { $('#saveBtn').disabled = $('#printBtn').disabled = false; }
+  }
+  const lineOn = () => state.lineEnabled && $('#lineToggle').getAttribute('aria-pressed') === 'true';
+
+  // สร้าง PDF 2 หน้า (Original + Copy) จากหน้าตาใบเดียวกับที่พิมพ์ — ใช้ส่งเข้า LINE
+  async function makePdf(d) {
+    if (!window.html2canvas || !window.jspdf) throw new Error('โหลดตัวสร้าง PDF ไม่สำเร็จ (ตรวจอินเทอร์เน็ต)');
+    try { await document.fonts.ready; } catch (e) {}
+    const stage = document.createElement('div'); stage.id = 'pdfStage';
+    stage.innerHTML = sheetHTML(d, 'Original', 1) + sheetHTML(d, 'Copy', 2);
+    document.body.appendChild(stage);
+    try {
+      const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', compress: true });
+      const pages = [...stage.querySelectorAll('.sheet')];
+      for (let i = 0; i < pages.length; i++) {
+        const c = await window.html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', logging: false, useCORS: true });
+        if (i) pdf.addPage('a4');
+        pdf.addImage(c.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 210, 297);
+      }
+      return pdf.output('datauristring');
+    } finally { stage.remove(); }
+  }
+  let lineBusy = Promise.resolve();
+  function sendLine(d) {
+    lineBusy = lineBusy.then(async () => {
+      const p = $('#saveState');
+      p.textContent = 'กำลังส่งเข้า LINE…'; p.className = 'status-pill';
+      try {
+        const pdf = await makePdf(d);
+        const r = await api('sendRequestToLine', d.jobNo, pdf);
+        if (!r.sent) toast('บันทึก PDF ลง Drive แล้ว แต่ไม่ได้ส่ง LINE: ' + r.reason, true);
+        else toast('ส่งใบ Job No. ' + fmtJob(d.jobNo) + ' เข้ากลุ่ม LINE แล้ว' + (r.tagged ? ' · แท็ก ' + r.staff : (r.staff ? ' · ' + r.staff + ' ยังไม่ได้ผูก LINE (พิมพ์ /register ในกลุ่ม)' : '')) + (r.preview ? ' (ตัวอย่าง ไม่ได้ส่งจริง)' : ''));
+      } catch (err) { toast('ส่ง LINE ไม่สำเร็จ: ' + msgOf(err), true); }
+      finally { markDirty(); }
+    });
+    return lineBusy;
+  }
+
+  async function saveAndPrint() {
+    let d;
+    try { d = await save(); } catch (e) { return; }
+    await new Promise(r => setTimeout(r, 50));
+    $('#printRoot').innerHTML = sheetHTML(d, 'Original', 1) + sheetHTML(d, 'Copy', 2);
+    const old = document.title;
+    document.title = 'Request check sheet receive return ' + d.jobNo;
+    setTimeout(() => {
+      window.print();
+      document.title = old;
+      if (!HAS_GAS) toast('โหมดตัวอย่าง: ถ้าหน้าต่างพิมพ์ไม่ขึ้น ให้ลองในเว็บแอปจริง');
+    }, 150);
+  }
+
+  function newSheet() {
+    const d = blank();
+    d.jobNo = state.nextJobNo || '';
+    const me = state.staff.find(s => s.name === $('#f_staffName').value);
+    if (me) { d.staffName = me.name; d.sig.recvStaff = shortSig(me.name); }
+    writeForm(d); state.lastSaved = ''; markDirty(); showErr('');
+    window.scrollTo({ top: 0 });
+  }
+  async function openJob(no) {
+    no = String(no || '').trim(); if (!no) return;
+    $('#openBtn').disabled = true;
+    try { const d = await api('getRequest', no); writeForm(d); state.lastSaved = JSON.stringify(readForm()); markDirty(); $('#openJob').value = ''; toast('เปิดใบ Job No. ' + fmtJob(no) + ' แล้ว'); showErr(''); }
+    catch (err) { toast(msgOf(err), true); }
+    finally { $('#openBtn').disabled = false; }
+  }
+
+  // ---------- events ----------
+  $('#form').addEventListener('input', () => { render(); markDirty(); });
+  $('#form').addEventListener('change', () => { render(); markDirty(); });
+  $('#form').addEventListener('submit', e => e.preventDefault());
+  $('#form').addEventListener('click', e => {
+    const b = e.target.closest('.seg button'); if (!b) return;
+    const seg = b.closest('.seg');
+    if (seg.dataset.radio) {
+      const on = b.getAttribute('aria-pressed') === 'true';
+      seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', on ? 'false' : 'true');   // กดซ้ำเพื่อยกเลิก
+      if (seg.dataset.radio === 'phase' && b.dataset.v === 'Other' && !on) $('#f_phaseOther').focus();
+    } else b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true');
+    render(); markDirty();
+  });
+  $('#f_phaseOther').addEventListener('input', () => {
+    if ($('#f_phaseOther').value.trim()) $$('[data-radio="phase"] button').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === 'Other'));
+  });
+  $('#f_staffName').addEventListener('change', () => {
+    const s = state.staff.find(x => x.name === $('#f_staffName').value); if (!s) return;
+    if (!$('#s_recvStaff').value.trim() || $('#s_recvStaff').dataset.auto) { $('#s_recvStaff').value = shortSig(s.name); $('#s_recvStaff').dataset.auto = '1'; }
+    if (s.role && /sales/i.test(s.role)) $$('[data-radio="staffType"] button').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === 'Sales'));
+    render(); markDirty();
+  });
+  $('#s_recvStaff').addEventListener('input', e => { delete e.target.dataset.auto; });
+  $('#f_customer').addEventListener('change', () => {
+    const v = $('#f_customer').value.trim().toLowerCase();
+    const c = state.customers.filter(x => x.customer.toLowerCase() === v).pop(); if (!c) return;
+    [['userName', 'userName'], ['department', 'department'], ['email', 'email'], ['tel', 'tel']].forEach(([f, k]) => { if (!$('#f_' + f).value.trim()) $('#f_' + f).value = c[k] || ''; });
+    render(); markDirty();
+  });
+  $('#f_maker').addEventListener('input', updateMakerCard);
+  $('#f_maker').addEventListener('change', () => {
+    const g = findMaker($('#f_maker').value);
+    if (g && g.name.toLowerCase() === $('#f_maker').value.trim().toLowerCase()) { /* ชื่อตรงแล้ว */ }
+    updateMakerCard();
+  });
+  $('#saveBtn').addEventListener('click', () => save().catch(() => {}));
+  $('#printBtn').addEventListener('click', saveAndPrint);
+  $('#lineToggle').addEventListener('click', e => { const b = e.currentTarget; b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true'); try { localStorage.setItem('rcsLine', b.getAttribute('aria-pressed')); } catch (er) {} });
+  try { if (localStorage.getItem('rcsLine') === 'false') $('#lineToggle').setAttribute('aria-pressed', 'false'); } catch (er) {}
+  $('#newBtn').addEventListener('click', () => {
+    if (state.dirty && !$('#newBtn').dataset.confirm) { $('#newBtn').dataset.confirm = '1'; $('#newBtn').querySelector('.lbl').textContent = 'กดอีกครั้งเพื่อล้าง'; toast('ใบนี้ยังไม่บันทึก กด “ใบใหม่” อีกครั้งเพื่อล้างข้อมูล', true); setTimeout(() => { delete $('#newBtn').dataset.confirm; $('#newBtn').querySelector('.lbl').textContent = 'ใบใหม่'; }, 4000); return; }
+    delete $('#newBtn').dataset.confirm; $('#newBtn').querySelector('.lbl').textContent = 'ใบใหม่';
+    newSheet();
+  });
+  $('#openBtn').addEventListener('click', () => openJob($('#openJob').value));
+  $('#openJob').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); openJob($('#openJob').value); } });
+  $$('.viewtabs button').forEach(b => b.addEventListener('click', () => {
+    document.body.dataset.view = b.dataset.view;
+    $$('.viewtabs button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    fitPaper(); window.scrollTo({ top: 0 });
+  }));
+  document.body.dataset.view = 'form';
+  window.addEventListener('beforeprint', () => { if (!$('#printRoot').innerHTML) { const d = readForm(); $('#printRoot').innerHTML = sheetHTML(d, 'Original', 1) + sheetHTML(d, 'Copy', 2); } });
+  window.addEventListener('afterprint', () => { $('#printRoot').innerHTML = ''; });
+
+  let tt;
+  function toast(m, bad) { const t = $('#toast'); t.textContent = m; t.classList.toggle('bad', !!bad); t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2800); }
+
+  // ---------- start ----------
+  $('#previewNote').hidden = !!HAS_GAS;
+  writeForm(blank());
+  api('getRequestInit').then(res => {
+    setInit(res);
+    appParams(p => {
+      if (p.job) return openJob(p.job);
+      if (!HAS_GAS) { writeForm(PREVIEW.saved['2326']); state.lastSaved = JSON.stringify(readForm()); markDirty(); return; }  // ตัวอย่างจากใบจริง 2326
+      newSheet();
+      if (p.maker) { $('#f_maker').value = p.maker; updateMakerCard(); render(); }
+    });
+  }).catch(err => { showErr('โหลดข้อมูลไม่สำเร็จ: ' + msgOf(err)); });
+})();
+</script>
