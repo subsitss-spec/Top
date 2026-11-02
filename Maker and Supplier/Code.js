@@ -1,5 +1,5 @@
 /**
- * NDT-B Service Portal  V1.01  (30 ต.ค. 2026)
+ * NDT-B Service Portal  V1.02  (2 พ.ย. 2026) — ธีมแบบ Apple (Theme.html)
  * หน้าหลัก → (1) Maker Directory  (2) Request Check Sheet (Receive / Return) พิมพ์เป็น PDF
  *
  * ผูกสคริปต์นี้กับสเปรดชีต "Contact Maker and Supplier" (Extensions → Apps Script)
@@ -9,7 +9,7 @@
  */
 
 // ======================= ค่าคงที่ =======================
-var APP_VERSION = 'V1.01';
+var APP_VERSION = 'V1.02';
 var MAKER_SHEET_NAME = 'ชีต1';           // ถ้าไม่เจอชื่อนี้ จะใช้แท็บแรกของไฟล์
 var REQ_SHEET_NAME = 'RequestCheckSheet';
 var STAFF_SHEET_NAME = 'Staff';

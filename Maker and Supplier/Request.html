@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Tinos:wght@400;700&family=Arimo:wght@400&family=Sarabun:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Roboto+Slab:wght@700&family=Tinos:wght@400;700&family=Arimo:wght@400&family=Sarabun:wght@400;500&display=swap">
 <style>
 /* Layout: navy masthead → sticky action bar → form (left) beside a live A4 preview of the real sheet (right); print renders 2 A4 pages: Original + Copy */
 :root {
@@ -209,6 +209,7 @@ form { display: grid; gap: 14px; min-width: 0; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<?!= include('Theme') ?>
 
 <header class="masthead">
   <div class="wrap">
@@ -335,7 +336,7 @@ form { display: grid; gap: 14px; min-width: 0; }
   </div>
 </main>
 
-<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.01 · Request Check Sheet</footer>
+<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.02 · Request Check Sheet</footer>
 <div id="printRoot" aria-hidden="true"></div>
 <datalist id="makerList"></datalist>
 <datalist id="customerList"></datalist>

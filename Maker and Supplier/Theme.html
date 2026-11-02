@@ -1,0 +1,173 @@
+<style>
+/* ============================================================
+   Theme — NDT-B Service Portal V1.02  (Apple-style look)
+   ใส่หลัง <style> ของแต่ละหน้า (include('Theme')) จึงทับค่าเดิมได้
+   ไม่แตะใบพิมพ์ A4 (.sheet / --paper-*) — ใบพิมพ์ยังเหมือนฟอร์มเดิม
+   ============================================================ */
+:root {
+  --bg: #f5f5f7; --surface: #ffffff; --surface-2: #f5f5f7; --fg: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7;
+  --ink: #f5f5f7; --ink-fg: #1d1d1f;
+  --primary: #0071e3; --primary-fg: #ffffff; --accent: #0071e3; --accent-ink: #ffffff;
+  --danger: #d70015; --danger-bg: #fff0f1; --ok: #248a3d; --line-green: #06a046;
+  --glass: rgba(255, 255, 255, .72);
+  --hairline: rgba(0, 0, 0, .08);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .04);
+  --shadow-hover: 0 12px 32px -8px rgba(0, 0, 0, .16);
+  --paper-shadow: 0 2px 6px rgba(0, 0, 0, .06), 0 24px 48px -24px rgba(0, 0, 0, .28);
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Noto Sans Thai", "Helvetica Neue", "Leelawadee UI", Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Noto Sans Thai", "Helvetica Neue", "Leelawadee UI", Arial, sans-serif;
+  --font-mono: var(--font-body);
+  --r: 18px;
+  --tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='240'%3E%3Cg font-family='Rockwell, Roboto Slab, Georgia, Times New Roman, serif' font-weight='700' font-size='40' fill='%23014099'%3E%3Ctext x='20' y='62'%3EService%3C/text%3E%3Ctext x='240' y='182'%3EService%3C/text%3E%3C/g%3E%3C/svg%3E");
+  --brand-word: #014099; --watermark-opacity: .06;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --surface: #1c1c1e; --surface-2: #2c2c2e; --fg: #f5f5f7; --muted: #a1a1a6; --line: #3a3a3c;
+    --ink: #000000; --ink-fg: #f5f5f7;
+    --primary: #2997ff; --primary-fg: #ffffff; --accent: #2997ff; --accent-ink: #ffffff;
+    --danger: #ff6961; --danger-bg: #3a1d1d; --ok: #30d158; --line-green: #30d158;
+    --glass: rgba(22, 22, 23, .72); --hairline: rgba(255, 255, 255, .1);
+    --shadow: 0 0 0 1px rgba(255, 255, 255, .04); --shadow-hover: 0 12px 32px -8px rgba(0, 0, 0, .8);
+    --paper-shadow: 0 24px 48px -24px rgba(0, 0, 0, .9);
+    --tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='240'%3E%3Cg font-family='Rockwell, Roboto Slab, Georgia, Times New Roman, serif' font-weight='700' font-size='40' fill='%23ffffff'%3E%3Ctext x='20' y='62'%3EService%3C/text%3E%3Ctext x='240' y='182'%3EService%3C/text%3E%3C/g%3E%3C/svg%3E"); --brand-word: #ffffff; --watermark-opacity: .07;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #000000; --surface: #1c1c1e; --surface-2: #2c2c2e; --fg: #f5f5f7; --muted: #a1a1a6; --line: #3a3a3c;
+  --ink: #000000; --ink-fg: #f5f5f7;
+  --primary: #2997ff; --primary-fg: #ffffff; --accent: #2997ff; --accent-ink: #ffffff;
+  --danger: #ff6961; --danger-bg: #3a1d1d; --ok: #30d158; --line-green: #30d158;
+  --glass: rgba(22, 22, 23, .72); --hairline: rgba(255, 255, 255, .1);
+  --shadow: 0 0 0 1px rgba(255, 255, 255, .04); --shadow-hover: 0 12px 32px -8px rgba(0, 0, 0, .8);
+  --paper-shadow: 0 24px 48px -24px rgba(0, 0, 0, .9);
+  --tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='440' height='240'%3E%3Cg font-family='Rockwell, Roboto Slab, Georgia, Times New Roman, serif' font-weight='700' font-size='40' fill='%23ffffff'%3E%3Ctext x='20' y='62'%3EService%3C/text%3E%3Ctext x='240' y='182'%3EService%3C/text%3E%3C/g%3E%3C/svg%3E"); --brand-word: #ffffff; --watermark-opacity: .07;
+  color-scheme: dark;
+}
+
+@media screen {
+
+  /* ---------- พื้นหลัง: คำว่า Service จาง ๆ + คำว่า Service ที่หัวหน้า ---------- */
+  html, body { background: var(--bg); }
+  body { position: relative; isolation: isolate; }
+  body::after {
+    content: ""; position: fixed; z-index: -1; pointer-events: none; inset: -40%;
+    background: var(--tile) 0 0 / 440px 240px repeat;
+    transform: rotate(-14deg); opacity: var(--watermark-opacity);
+  }
+  .masthead { background: transparent; }
+  .eyebrow::before {
+    content: "Service"; display: block; margin-bottom: 10px;
+    font-family: "Roboto Slab", Rockwell, Georgia, "Times New Roman", serif; font-weight: 700;
+    font-size: 36px; line-height: 1; letter-spacing: 0; color: var(--brand-word);
+  }
+  body { font-size: 15px; line-height: 1.5; letter-spacing: -.005em; -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent); outline-offset: 2px; }
+  a { color: var(--primary); }
+
+  /* ---------- หัวหน้า (hero) ---------- */
+  .masthead { color: var(--fg); }
+  .masthead .wrap { padding-block: 44px 26px; }
+  .eyebrow { font-family: var(--font-body); font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; opacity: 1; color: var(--muted); }
+  h1, .brand h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.028em; line-height: 1.06; color: var(--fg); }
+  .brand h1 { font-size: clamp(32px, 5vw, 48px); }
+  .masthead > .wrap > h1 { font-size: clamp(42px, 7.5vw, 68px); }
+  .masthead > .wrap > p { font-size: 19px; max-width: 46ch; }
+  .masthead p, .brand p { opacity: 1; color: var(--muted); font-size: 17px; line-height: 1.45; }
+  .backlink { color: var(--primary); opacity: 1; font-size: 15px; font-weight: 500; margin-bottom: 6px; gap: 2px; }
+  .backlink:hover { text-decoration: none; opacity: .8; }
+
+  /* ตัวเลขสรุป → การ์ดตัวเลขแบบ Apple */
+  .tag, .jobtag { background: var(--surface); color: var(--fg); border-radius: 18px; box-shadow: var(--shadow); font-family: var(--font-body); }
+  .tag div, .jobtag div { padding: 10px 18px; }
+  .tag div + div, .jobtag div + div { border-left: 1px solid var(--hairline); }
+  .tag b, .jobtag b { font-family: var(--font-display); font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+  .tag span, .jobtag span { font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .strip { font-family: var(--font-body); font-size: 13px; gap: 8px; margin-top: 18px; }
+  .strip span { background: var(--surface); color: var(--fg); padding: 6px 14px; border-radius: 980px; box-shadow: var(--shadow); font-weight: 500; }
+  .strip span.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); box-shadow: none; }
+  .preview-note { background: var(--surface-2); border-bottom: 1px solid var(--hairline); }
+
+  /* ---------- แถบเครื่องมือแบบกระจกเบลอ ---------- */
+  .toolbar, .actionbar { background: var(--glass); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--hairline); }
+
+  /* ---------- ปุ่มแคปซูล ---------- */
+  .btn { height: 38px; padding: 0 18px; border-radius: 980px; border: 0; background: color-mix(in srgb, var(--fg) 7%, transparent); color: var(--fg); font-weight: 500; font-size: 14px; transition: background .2s, transform .1s; }
+  .btn:hover { background: color-mix(in srgb, var(--fg) 11%, transparent); }
+  .btn:active { transform: scale(.97); }
+  .btn.primary, .btn.accent { background: var(--primary); color: var(--primary-fg); border: 0; font-weight: 500; }
+  .btn.primary:hover, .btn.accent:hover { background: color-mix(in srgb, var(--primary) 88%, #000); filter: none; }
+  .btn.danger { color: var(--danger); }
+  .btn.sm { height: 32px; padding: 0 14px; font-size: 13px; }
+  .x { border-radius: 50%; border: 0; background: color-mix(in srgb, var(--fg) 7%, transparent); }
+  .copy { border-radius: 8px; border: 0; background: color-mix(in srgb, var(--fg) 6%, transparent); }
+  .copy.ok { background: color-mix(in srgb, var(--primary) 15%, transparent); }
+
+  /* ---------- ช่องกรอก ---------- */
+  .search input, .open-job input, .field input, .field select, .field textarea, .sig input, #dLogoUrl {
+    border-radius: 12px; border: 1px solid var(--line); background: var(--surface); transition: border-color .15s, box-shadow .15s;
+  }
+  .search input { height: 40px; background: color-mix(in srgb, var(--fg) 6%, transparent); border-color: transparent; }
+  .search input:focus, .open-job input:focus, .field input:focus, .field select:focus, .field textarea:focus, .sig input:focus {
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+  .field label, .flabel { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .field label small, .flabel small { color: var(--muted); }
+
+  /* ชิปกรอง / ตัวเลือก */
+  .chip { height: 34px; border-radius: 980px; border: 0; background: var(--surface); box-shadow: 0 0 0 1px var(--line) inset; font-size: 13.5px; }
+  .chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); box-shadow: none; }
+  .chip .n { font-family: var(--font-body); }
+  .seg button, .cpick button { border-radius: 12px; border-color: var(--line); }
+  .seg button[aria-pressed="true"], .cpick button[aria-pressed="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 9%, var(--surface)); }
+  .cc { font-family: var(--font-body); font-weight: 600; font-size: 10.5px; letter-spacing: .02em; border-radius: 6px; border: 0; background: color-mix(in srgb, var(--fg) 7%, transparent); }
+
+  /* ---------- การ์ด ---------- */
+  .card, .door, .sec { border: 0; border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow); }
+  .card { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+  .card:hover, .door:hover { transform: scale(1.015); border-color: transparent; box-shadow: var(--shadow-hover); }
+  .door { padding: 28px; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+  .door .icon { border-radius: 14px; background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+  .door h2 { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .door p { font-size: 15.5px; }
+  .door .go { border-top: 0; padding-top: 4px; color: var(--primary); font-weight: 500; font-size: 16px; justify-content: flex-start; gap: 10px; }
+  .door .go::after { content: "›"; font-size: 22px; line-height: 1; order: 1; }
+  .door .go small { order: 2; margin-left: auto; font-family: var(--font-body); }
+  .doors { gap: 20px; }
+
+  .plate { background: #ffffff; border-bottom: 1px solid var(--hairline); }
+  .plate::before, .plate::after { display: none; }
+  .card-body { padding: 14px 16px 16px; }
+  .card-name { font-family: var(--font-display); font-weight: 600; font-size: 17px; letter-spacing: -.012em; }
+  .domain, .resultline { font-family: var(--font-body); }
+  .mono { border-radius: 14px; }
+  .skeleton { border: 0; border-radius: var(--r); }
+  .empty { border-radius: var(--r); }
+
+  .sec { padding: 20px 22px 22px; gap: 14px; }
+  .sec h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+  .maker-card { border-radius: 14px; border-style: solid; border-color: var(--hairline); }
+  .sig { border-radius: 14px; border-color: var(--hairline); }
+  .err { border-radius: 12px; }
+  .status-pill, .reply-list button small, .preview-head b { font-family: var(--font-body); }
+  .paper-frame { border-radius: 10px; }
+
+  /* ---------- กล่องโต้ตอบ ---------- */
+  dialog { border-radius: 22px; box-shadow: 0 40px 100px -20px rgba(0, 0, 0, .45); }
+  dialog::backdrop { background: rgba(0, 0, 0, .32); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .dlg-head { border-bottom: 1px solid var(--hairline); }
+  .dlg-foot { background: var(--surface); border-top: 1px solid var(--hairline); border-radius: 0 0 22px 22px; }
+  .dlg-title { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; font-size: 24px; }
+  .contact { border-radius: 16px; border-color: var(--hairline); }
+  .contact-head { background: var(--surface-2); border-bottom-color: var(--hairline); }
+  .contact-label, .contact-label small, .tel, .role, .email a, .section-label { font-family: var(--font-body); }
+  .role, .section-label { letter-spacing: .04em; }
+  .drop { border-radius: 16px; }
+  .stage { border-radius: 14px; }
+  #toast { border-radius: 980px; padding: 11px 20px; }
+
+  footer { font-family: var(--font-body) !important; font-size: 12px !important; color: var(--muted); }
+}
+@media (prefers-reduced-motion: reduce) { .card, .door, .btn { transition: none !important; } }
+</style>

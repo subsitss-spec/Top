@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Roboto+Slab:wght@700&display=swap">
 <style>
 /* Layout: navy instrument-panel masthead → sticky toolbar → grid of "nameplate" cards; details and forms open in dialogs */
 :root {
@@ -236,6 +236,7 @@ dialog::backdrop { background: rgba(8,19,28,.55); backdrop-filter: blur(2px); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
+<?!= include('Theme') ?>
 
 <header class="masthead">
   <div class="wrap">
@@ -277,7 +278,7 @@ dialog::backdrop { background: rgba(8,19,28,.55); backdrop-filter: blur(2px); }
     </div>
   </div>
 </main>
-<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.01 · Maker Directory</footer>
+<footer class="wrap" style="padding-block:0 28px;color:var(--muted);font-family:var(--font-mono);font-size:11px">NDT-B Service Portal V1.02 · Maker Directory</footer>
 
 <!-- รายละเอียด Maker -->
 <dialog id="detailDlg" aria-labelledby="dTitle">
